@@ -20,7 +20,7 @@ inputs:
   api-url:
     description: "Hawckeye API base URL."
     required: false
-    default: "https://api.hawckeye.io"
+    default: "https://api.hawckeye.com"
   wait:
     description: "Wait for the scan to finish before posting results."
     required: false

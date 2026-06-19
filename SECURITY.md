@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **security@hawckeye.io**. Please do not open public issues for security
+Email **security@hawckeye.com**. Please do not open public issues for security
 reports. We aim to acknowledge within 2 business days.
 
 ## What runs in your pipeline

@@ -16,7 +16,7 @@ spec:
       default: ""
       description: "Path to an APK artifact. Use this OR asset-id."
     api-url:
-      default: "https://api.hawckeye.io"
+      default: "https://api.hawckeye.com"
     wait:
       default: "true"
     timeout:

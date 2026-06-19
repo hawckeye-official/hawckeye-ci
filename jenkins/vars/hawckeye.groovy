@@ -13,7 +13,7 @@
 //     failOn: 'none'                  // none|low|medium|high|critical|any
 //   )
 def call(Map cfg = [:]) {
-  String apiUrl     = cfg.apiUrl     ?: 'https://api.hawckeye.io'
+  String apiUrl     = cfg.apiUrl     ?: 'https://api.hawckeye.com'
   String assetId    = cfg.assetId    ?: ''
   String apk        = cfg.apk        ?: ''
   String failOn     = cfg.failOn     ?: 'none'

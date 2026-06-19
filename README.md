@@ -1,6 +1,6 @@
 # Hawckeye Autonomous Pentest — CI integration
 
-Trigger a [Hawckeye](https://hawckeye.io) autonomous pentest against an **authorized
+Trigger a [Hawckeye](https://hawckeye.com) autonomous pentest against an **authorized
 URL or APK** from your CI, and get findings posted back to the PR/MR. Non-blocking
 by default.
 
@@ -45,7 +45,7 @@ jobs:
 |---|---|---|
 | `token` | — | **required**, Hawckeye API key |
 | `asset-id` / `apk` | — | one is required |
-| `api-url` | `https://api.hawckeye.io` | |
+| `api-url` | `https://api.hawckeye.com` | |
 | `wait` | `true` | wait for the scan to finish |
 | `timeout` | `1800` | seconds |
 | `fail-on` | `none` | `none\|low\|medium\|high\|critical\|any` |

@@ -22,7 +22,7 @@ parameters:
     default: ''
   - name: apiUrl
     type: string
-    default: 'https://api.hawckeye.io'
+    default: 'https://api.hawckeye.com'
   - name: wait
     type: string
     default: 'true'

@@ -21,4 +21,4 @@ What it does **not** do:
 
 You can read every line that runs: see `scripts/` in this repository.
 
-Questions: security@hawckeye.io
+Questions: security@hawckeye.com

@@ -11,7 +11,7 @@
 #   HAWKEYE_ASSET_ID     registered authorized asset id (URL target)   ─┐ one of
 #   HAWKEYE_APK          path to an APK artifact to scan               ─┘ these
 # Optional env:
-#   HAWKEYE_API          API base url        (default https://api.hawckeye.io)
+#   HAWKEYE_API          API base url        (default https://api.hawckeye.com)
 #   HAWKEYE_WAIT         true|false          (default true)
 #   HAWKEYE_TIMEOUT      seconds to wait     (default 1800)
 #   HAWKEYE_POLL_INTERVAL seconds            (default 15)
@@ -19,7 +19,7 @@
 #   HAWKEYE_OUTPUT_DIR   where to write outputs (default .)
 set -euo pipefail
 
-: "${HAWKEYE_API:=https://api.hawckeye.io}"
+: "${HAWKEYE_API:=https://api.hawckeye.com}"
 : "${HAWKEYE_WAIT:=true}"
 : "${HAWKEYE_TIMEOUT:=1800}"
 : "${HAWKEYE_POLL_INTERVAL:=15}"
