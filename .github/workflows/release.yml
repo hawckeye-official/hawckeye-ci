@@ -1,0 +1,27 @@
+# Keeps the floating major tag (v1) pointed at the latest v1.x.y release,
+# so consumers can pin `your-org/hawkeye-ci@v1`.
+# Marketplace publishing itself is a one-time manual step: edit the GitHub
+# Release and tick "Publish this Action to the GitHub Marketplace".
+name: release
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  move-major-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move major tag
+        run: |
+          set -euo pipefail
+          ref="${GITHUB_REF_NAME}"          # e.g. v1.2.3
+          major="${ref%%.*}"                # -> v1
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$major"
+          git push -f origin "$major"
+          echo "moved $major -> $ref"

@@ -1,0 +1,72 @@
+# Hawkeye Autonomous Pentest — GitLab CI/CD Component.
+# Usage in a consumer .gitlab-ci.yml:
+#
+#   include:
+#     - component: $CI_SERVER_FQDN/your-org/hawkeye-ci/scan@1
+#       inputs:
+#         asset-id: "as_9f3..."        # or apk: "build/app-release.apk"
+#
+# Set CI/CD variables: HAWKEYE_TOKEN (masked) and GITLAB_TOKEN (api scope, for the MR note).
+spec:
+  inputs:
+    asset-id:
+      default: ""
+      description: "Registered authorized asset id (URL target). Use this OR apk."
+    apk:
+      default: ""
+      description: "Path to an APK artifact. Use this OR asset-id."
+    api-url:
+      default: "https://api.hawkeye.io"
+    wait:
+      default: "true"
+    timeout:
+      default: "1800"
+    fail-on:
+      default: "none"
+      description: "none|low|medium|high|critical|any. Default none (report-only)."
+    stage:
+      default: "test"
+    image:
+      default: "alpine:3.20"
+    client-ref:
+      default: "v1"
+      description: "Tag of hawkeye-ci to fetch the engine-free client scripts from."
+    client-base:
+      default: "https://gitlab.com/your-org/hawkeye-ci/-/raw"
+---
+hawkeye-scan:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+  allow_failure: true            # non-blocking by default
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+  variables:
+    HAWKEYE_API: "$[[ inputs.api-url ]]"
+    HAWKEYE_ASSET_ID: "$[[ inputs.asset-id ]]"
+    HAWKEYE_APK: "$[[ inputs.apk ]]"
+    HAWKEYE_WAIT: "$[[ inputs.wait ]]"
+    HAWKEYE_TIMEOUT: "$[[ inputs.timeout ]]"
+    HAWKEYE_FAIL_ON: "$[[ inputs.fail-on ]]"
+    HAWKEYE_REF: "$CI_COMMIT_SHA"
+    HAWKEYE_OUTPUT_DIR: "."
+    CLIENT_URL: "$[[ inputs.client-base ]]/$[[ inputs.client-ref ]]/scripts"
+  before_script:
+    - command -v bash >/dev/null || apk add --no-cache bash >/dev/null
+    - apk add --no-cache curl jq >/dev/null 2>&1 || (apt-get update -qq && apt-get install -y -qq curl jq) || true
+    - mkdir -p .hawkeye
+    - curl -fsSL "$CLIENT_URL/hawkeye-core.sh" -o .hawkeye/core.sh
+    - curl -fsSL "$CLIENT_URL/post-gitlab.sh" -o .hawkeye/post.sh
+    - curl -fsSL "$CLIENT_URL/gate.sh"         -o .hawkeye/gate.sh
+    - chmod +x .hawkeye/*.sh
+  script:
+    - bash .hawkeye/core.sh
+    - bash .hawkeye/post.sh hawkeye-report.md
+    - >
+      HAWKEYE_FINDINGS_COUNT="$(jq '(.findings // []) | length' hawkeye-findings.json)"
+      HAWKEYE_MAX_SEVERITY="$(jq -r 'def r:{info:0,low:1,medium:2,high:3,critical:4}[(.|ascii_downcase)]//0; ((.findings//[])|map((.severity//"info")|r)|max//0) as $m|["info","low","medium","high","critical"][$m]' hawkeye-findings.json)"
+      bash .hawkeye/gate.sh
+  artifacts:
+    when: always
+    paths:
+      - hawkeye-findings.json
+      - hawkeye-report.md

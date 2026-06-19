@@ -1,0 +1,88 @@
+name: "Hawkeye Autonomous Pentest"
+description: "Trigger a Hawkeye pentest against an authorized URL or APK and report findings on the PR. Non-blocking by default."
+author: "Hawkeye"
+branding:
+  icon: "shield"
+  color: "purple"
+
+inputs:
+  token:
+    description: "Hawkeye API key (store as a repo/org secret)."
+    required: true
+  asset-id:
+    description: "Registered authorized asset id (URL target). Use this OR apk."
+    required: false
+    default: ""
+  apk:
+    description: "Path to an APK artifact to scan. Use this OR asset-id."
+    required: false
+    default: ""
+  api-url:
+    description: "Hawkeye API base URL."
+    required: false
+    default: "https://api.hawkeye.io"
+  wait:
+    description: "Wait for the scan to finish before posting results."
+    required: false
+    default: "true"
+  timeout:
+    description: "Max seconds to wait for an async scan."
+    required: false
+    default: "1800"
+  fail-on:
+    description: "Fail the step on findings: none|low|medium|high|critical|any. Default none (report-only)."
+    required: false
+    default: "none"
+  comment:
+    description: "Post a sticky PR comment with results."
+    required: false
+    default: "true"
+  github-token:
+    description: "Token used to post the PR comment."
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  scan-id:
+    description: "The Hawkeye scan id."
+    value: ${{ steps.scan.outputs.scan_id }}
+  status:
+    description: "Final scan status."
+    value: ${{ steps.scan.outputs.status }}
+  findings-count:
+    description: "Number of findings."
+    value: ${{ steps.scan.outputs.findings_count }}
+  max-severity:
+    description: "Highest finding severity."
+    value: ${{ steps.scan.outputs.max_severity }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: scan
+      shell: bash
+      env:
+        HAWKEYE_API: ${{ inputs.api-url }}
+        HAWKEYE_TOKEN: ${{ inputs.token }}
+        HAWKEYE_ASSET_ID: ${{ inputs.asset-id }}
+        HAWKEYE_APK: ${{ inputs.apk }}
+        HAWKEYE_WAIT: ${{ inputs.wait }}
+        HAWKEYE_TIMEOUT: ${{ inputs.timeout }}
+        HAWKEYE_REF: ${{ github.sha }}
+      run: bash "${{ github.action_path }}/scripts/hawkeye-core.sh"
+
+    - id: comment
+      if: ${{ inputs.comment == 'true' && always() }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: bash "${{ github.action_path }}/scripts/post-github.sh" "${{ steps.scan.outputs.report_file }}"
+
+    - id: gate
+      if: ${{ inputs.fail-on != 'none' && always() }}
+      shell: bash
+      env:
+        HAWKEYE_FAIL_ON: ${{ inputs.fail-on }}
+        HAWKEYE_FINDINGS_COUNT: ${{ steps.scan.outputs.findings_count }}
+        HAWKEYE_MAX_SEVERITY: ${{ steps.scan.outputs.max_severity }}
+      run: bash "${{ github.action_path }}/scripts/gate.sh"

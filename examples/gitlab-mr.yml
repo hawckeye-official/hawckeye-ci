@@ -1,0 +1,7 @@
+# Drop this in a consumer repo's .gitlab-ci.yml
+# CI/CD variables to set: HAWKEYE_TOKEN (masked), GITLAB_TOKEN (api scope, masked).
+include:
+  - component: $CI_SERVER_FQDN/your-org/hawkeye-ci/scan@1
+    inputs:
+      asset-id: "as_9f3c..."        # or  apk: "build/app-release.apk"
+      # fail-on: high               # uncomment to gate the pipeline

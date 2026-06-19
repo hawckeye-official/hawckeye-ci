@@ -1,0 +1,4 @@
+.hawkeye/
+hawkeye-findings.json
+hawkeye-report.md
+hawkeye-scan-id.txt
