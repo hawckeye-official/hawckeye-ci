@@ -1,0 +1,71 @@
+# Hawkeye Autonomous Pentest — Azure Pipelines steps template.
+# Quick adopt (no Marketplace extension needed). In a consumer pipeline:
+#
+#   resources:
+#     repositories:
+#       - repository: hawkeye
+#         type: github            # or git (Azure Repos)
+#         name: your-org/hawkeye-ci
+#         ref: refs/tags/v1
+#   steps:
+#     - template: azure/hawkeye-steps.yml@hawkeye
+#       parameters:
+#         assetId: 'as_9f3c...'   # or apk: 'build/app-release.apk'
+#
+# Define a secret variable HAWKEYE_TOKEN on the pipeline. Linux agent required.
+parameters:
+  - name: assetId
+    type: string
+    default: ''
+  - name: apk
+    type: string
+    default: ''
+  - name: apiUrl
+    type: string
+    default: 'https://api.hawkeye.io'
+  - name: wait
+    type: string
+    default: 'true'
+  - name: timeout
+    type: string
+    default: '1800'
+  - name: failOn
+    type: string
+    default: 'none'
+  - name: nonBlocking
+    type: boolean
+    default: true
+  - name: clientRef
+    type: string
+    default: 'v1'
+  - name: clientBase
+    type: string
+    default: 'https://raw.githubusercontent.com/your-org/hawkeye-ci'
+
+steps:
+  - bash: |
+      set -euo pipefail
+      command -v jq >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq jq)
+      mkdir -p .hawkeye
+      base="${{ parameters.clientBase }}/${{ parameters.clientRef }}/scripts"
+      for s in hawkeye-core.sh post-azure.sh gate.sh; do
+        curl -fsSL "$base/$s" -o ".hawkeye/$s"
+      done
+      chmod +x .hawkeye/*.sh
+      bash .hawkeye/hawkeye-core.sh
+      bash .hawkeye/post-azure.sh hawkeye-report.md
+      export HAWKEYE_FINDINGS_COUNT="$(jq '(.findings // []) | length' hawkeye-findings.json)"
+      export HAWKEYE_MAX_SEVERITY="$(jq -r 'def r:{info:0,low:1,medium:2,high:3,critical:4}[(.|ascii_downcase)]//0; ((.findings//[])|map((.severity//"info")|r)|max//0) as $m|["info","low","medium","high","critical"][$m]' hawkeye-findings.json)"
+      bash .hawkeye/gate.sh
+    displayName: 'Hawkeye Autonomous Pentest'
+    continueOnError: ${{ parameters.nonBlocking }}
+    env:
+      HAWKEYE_API: ${{ parameters.apiUrl }}
+      HAWKEYE_TOKEN: $(HAWKEYE_TOKEN)
+      HAWKEYE_ASSET_ID: ${{ parameters.assetId }}
+      HAWKEYE_APK: ${{ parameters.apk }}
+      HAWKEYE_WAIT: ${{ parameters.wait }}
+      HAWKEYE_TIMEOUT: ${{ parameters.timeout }}
+      HAWKEYE_FAIL_ON: ${{ parameters.failOn }}
+      HAWKEYE_REF: $(Build.SourceVersion)
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)

@@ -1,0 +1,23 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "name": "Hawkeye",
+  "friendlyName": "Hawkeye Autonomous Pentest",
+  "description": "Trigger a Hawkeye pentest against an authorized URL or APK and report findings on the PR.",
+  "helpMarkDown": "Set a secret variable HAWKEYE_TOKEN. Requires a Linux agent with bash/curl/jq.",
+  "category": "Utility",
+  "author": "Hawkeye",
+  "version": { "Major": 1, "Minor": 0, "Patch": 0 },
+  "instanceNameFormat": "Hawkeye pentest",
+  "inputs": [
+    { "name": "token", "type": "string", "label": "Hawkeye API key", "required": true, "helpMarkDown": "Use $(HAWKEYE_TOKEN) from a secret variable." },
+    { "name": "assetId", "type": "string", "label": "Asset id (URL target)", "required": false, "helpMarkDown": "Use this OR apk." },
+    { "name": "apk", "type": "string", "label": "APK path", "required": false, "helpMarkDown": "Use this OR assetId." },
+    { "name": "apiUrl", "type": "string", "label": "API URL", "defaultValue": "https://api.hawkeye.io", "required": false },
+    { "name": "wait", "type": "string", "label": "Wait for completion", "defaultValue": "true", "required": false },
+    { "name": "timeout", "type": "string", "label": "Timeout (s)", "defaultValue": "1800", "required": false },
+    { "name": "failOn", "type": "string", "label": "Fail on", "defaultValue": "none", "required": false, "helpMarkDown": "none|low|medium|high|critical|any" }
+  ],
+  "execution": {
+    "Node16": { "target": "run.js" }
+  }
+}

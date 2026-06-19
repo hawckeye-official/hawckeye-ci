@@ -64,11 +64,48 @@ include:
 > `GITLAB_TOKEN` needs `api` scope to post the MR note (the default
 > `CI_JOB_TOKEN` cannot create notes).
 
-## Azure DevOps / Jenkins
+## Azure DevOps
 
-The same scripts under `scripts/` run anywhere with `bash`, `curl`, and `jq`.
-Call `hawkeye-core.sh` then your platform's comment poster. Native task/plugin
-wrappers are on the roadmap.
+Quickest path — a steps template (Linux agent; set secret var `HAWKEYE_TOKEN`):
+
+```yaml
+resources:
+  repositories:
+    - repository: hawkeye
+      type: github
+      name: your-org/hawkeye-ci
+      endpoint: your-github-service-connection
+      ref: refs/tags/v1
+steps:
+  - template: azure/hawkeye-steps.yml@hawkeye
+    parameters:
+      assetId: "as_9f3c..."   # or apk: "build/app-release.apk"
+```
+
+A Marketplace **task extension** (`Hawkeye@1`) is scaffolded under
+`azure-devops-extension/` — run `build.sh` (needs `tfx-cli`) to package it.
+Enable *Allow scripts to access the OAuth token* so PR comments can post.
+
+## Jenkins
+
+Add this repo as a Global Pipeline Library named `hawkeye`, then:
+
+```groovy
+@Library('hawkeye') _
+hawkeye(
+  assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
+  hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawkeye API key
+  scmCredId: 'github-token',      // optional: PR comments on multibranch builds
+  repo: 'your-org/your-repo'
+)
+```
+
+## How the wrappers share one core
+
+Every platform runs the same engine-free scripts under `scripts/`
+(`hawkeye-core.sh` → `post-<platform>.sh` → `gate.sh`). GitHub bundles them via
+the action; GitLab/Azure/Jenkins fetch them from the pinned release tag. One
+codebase, four platforms.
 
 ## Publishing (maintainers)
 

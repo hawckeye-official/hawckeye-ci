@@ -1,0 +1,22 @@
+# Consumer pipeline (Azure DevOps). Define a secret variable HAWKEYE_TOKEN.
+# Linux agent required (bash/curl/jq).
+trigger: none
+pr:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: hawkeye
+      type: github          # or 'git' for Azure Repos
+      name: your-org/hawkeye-ci
+      endpoint: your-github-service-connection
+      ref: refs/tags/v1
+
+steps:
+  - template: azure/hawkeye-steps.yml@hawkeye
+    parameters:
+      assetId: 'as_9f3c...'     # or apk: 'build/app-release.apk'
+      # failOn: high            # gate the build (also set nonBlocking: false)

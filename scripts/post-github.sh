@@ -8,13 +8,14 @@ report="${1:-hawkeye-report.md}"
 : "${GITHUB_TOKEN:?GITHUB_TOKEN required to comment}"
 
 api="${GITHUB_API_URL:-https://api.github.com}"
-repo="${GITHUB_REPOSITORY:?GITHUB_REPOSITORY required}"
+repo="${GITHUB_REPOSITORY:-}"
 
-pr=""
-if [ -n "${GITHUB_EVENT_PATH:-}" ] && [ -f "$GITHUB_EVENT_PATH" ]; then
+pr="${HAWKEYE_PR:-}"   # explicit override (Jenkins/other) wins
+if [ -z "$pr" ] && [ -n "${GITHUB_EVENT_PATH:-}" ] && [ -f "$GITHUB_EVENT_PATH" ]; then
   pr="$(jq -r '.pull_request.number // .issue.number // empty' "$GITHUB_EVENT_PATH")"
 fi
 [ -n "$pr" ] || { echo "hawkeye: not a PR context; skipping comment"; exit 0; }
+[ -n "$repo" ] || { echo "hawkeye: no repo; skipping comment"; exit 0; }
 
 marker="<!-- hawkeye-report -->"
 payload="$(jq -nc --rawfile b "$report" '{body:$b}')"
