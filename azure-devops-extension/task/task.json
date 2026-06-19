@@ -18,6 +18,6 @@
     { "name": "failOn", "type": "string", "label": "Fail on", "defaultValue": "none", "required": false, "helpMarkDown": "none|low|medium|high|critical|any" }
   ],
   "execution": {
-    "Node16": { "target": "run.js" }
+    "Node20_1": { "target": "run.js" }
   }
 }

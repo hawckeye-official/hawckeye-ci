@@ -3,7 +3,7 @@
   "id": "hawkeye-pentest",
   "name": "Hawckeye Autonomous Pentest",
   "version": "1.0.0",
-  "publisher": "your-publisher-id",
+  "publisher": "hawckeye",
   "description": "Trigger a Hawckeye pentest against an authorized URL or APK and report findings on the PR. Non-blocking by default.",
   "categories": ["Azure Pipelines"],
   "tags": ["security", "pentest", "DAST", "code review"],
