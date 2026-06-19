@@ -1,5 +1,5 @@
 # Drop this in a consumer repo at .github/workflows/hawkeye.yml
-name: Hawkeye Pentest
+name: Hawckeye Pentest
 on:
   pull_request:
 
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # URL target:
-      - uses: your-org/hawkeye-ci@v1
+      - uses: hawckeye-official/hawckeye-ci@v1
         with:
           token: ${{ secrets.HAWKEYE_TOKEN }}
           asset-id: "as_9f3c..."        # registered authorized target
@@ -21,7 +21,7 @@ jobs:
       # APK target (alternative): build the apk first, then point at the file
       # - uses: actions/download-artifact@v4
       #   with: { name: app-release }
-      # - uses: your-org/hawkeye-ci@v1
+      # - uses: hawckeye-official/hawckeye-ci@v1
       #   with:
       #     token: ${{ secrets.HAWKEYE_TOKEN }}
       #     apk: app-release.apk

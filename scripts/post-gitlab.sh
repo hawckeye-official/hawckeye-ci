@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Posts/updates a single sticky MR note with the Hawkeye report.
+# Posts/updates a single sticky MR note with the Hawckeye report.
 # Prefers GITLAB_TOKEN (project/group access token with `api` scope).
 # CI_JOB_TOKEN usually cannot create notes, so set GITLAB_TOKEN as a CI variable.
 set -euo pipefail

@@ -1,17 +1,17 @@
-# Hawkeye Autonomous Pentest — CI integration
+# Hawckeye Autonomous Pentest — CI integration
 
-Trigger a [Hawkeye](https://hawkeye.io) autonomous pentest against an **authorized
+Trigger a [Hawckeye](https://hawckeye.io) autonomous pentest against an **authorized
 URL or APK** from your CI, and get findings posted back to the PR/MR. Non-blocking
 by default.
 
 This repository is the **engine-free trigger client**. It contains no scanning
-logic — it only calls the hosted Hawkeye API, so it is safe to run on any runner.
-The pentest engine runs entirely on Hawkeye's infrastructure.
+logic — it only calls the hosted Hawckeye API, so it is safe to run on any runner.
+The pentest engine runs entirely on Hawckeye's infrastructure.
 
 ## How it works
 
 ```
-Your CI ──POST /v1/scans {asset_id|apk}──▶ Hawkeye API ──▶ engine runs the pentest
+Your CI ──POST /v1/scans {asset_id|apk}──▶ Hawckeye API ──▶ engine runs the pentest
    ▲                                                              │
    └──────────────── sticky PR/MR comment ◀── poll /findings ─────┘
 ```
@@ -21,7 +21,7 @@ onboarding. The API rejects anything not on your allowlist.
 
 ## Setup (once)
 
-1. Get a **Hawkeye API key** → store it as a CI secret named `HAWKEYE_TOKEN`.
+1. Get a **Hawckeye API key** → store it as a CI secret named `HAWKEYE_TOKEN`.
 2. Register your target (URL or mobile app) → you receive an **`asset-id`**.
 3. Add the snippet below.
 
@@ -35,7 +35,7 @@ jobs:
   hawkeye:
     runs-on: ubuntu-latest
     steps:
-      - uses: your-org/hawkeye-ci@v1
+      - uses: hawckeye-official/hawckeye-ci@v1
         with:
           token: ${{ secrets.HAWKEYE_TOKEN }}
           asset-id: "as_9f3c..."   # or  apk: app-release.apk
@@ -43,9 +43,9 @@ jobs:
 
 | Input | Default | Notes |
 |---|---|---|
-| `token` | — | **required**, Hawkeye API key |
+| `token` | — | **required**, Hawckeye API key |
 | `asset-id` / `apk` | — | one is required |
-| `api-url` | `https://api.hawkeye.io` | |
+| `api-url` | `https://api.hawckeye.io` | |
 | `wait` | `true` | wait for the scan to finish |
 | `timeout` | `1800` | seconds |
 | `fail-on` | `none` | `none\|low\|medium\|high\|critical\|any` |
@@ -56,7 +56,7 @@ jobs:
 ```yaml
 # .gitlab-ci.yml — set HAWKEYE_TOKEN and GITLAB_TOKEN (api scope) as CI variables
 include:
-  - component: $CI_SERVER_FQDN/your-org/hawkeye-ci/scan@1
+  - component: $CI_SERVER_FQDN/hawckeye-official/hawckeye-ci/scan@1
     inputs:
       asset-id: "as_9f3c..."   # or  apk: "build/app-release.apk"
 ```
@@ -73,7 +73,7 @@ resources:
   repositories:
     - repository: hawkeye
       type: github
-      name: your-org/hawkeye-ci
+      name: hawckeye-official/hawckeye-ci
       endpoint: your-github-service-connection
       ref: refs/tags/v1
 steps:
@@ -82,7 +82,7 @@ steps:
       assetId: "as_9f3c..."   # or apk: "build/app-release.apk"
 ```
 
-A Marketplace **task extension** (`Hawkeye@1`) is scaffolded under
+A Marketplace **task extension** (`Hawckeye@1`) is scaffolded under
 `azure-devops-extension/` — run `build.sh` (needs `tfx-cli`) to package it.
 Enable *Allow scripts to access the OAuth token* so PR comments can post.
 
@@ -91,12 +91,12 @@ Enable *Allow scripts to access the OAuth token* so PR comments can post.
 Add this repo as a Global Pipeline Library named `hawkeye`, then:
 
 ```groovy
-@Library('hawkeye') _
-hawkeye(
+@Library('hawckeye') _
+hawckeye(
   assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
-  hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawkeye API key
+  hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawckeye API key
   scmCredId: 'github-token',      // optional: PR comments on multibranch builds
-  repo: 'your-org/your-repo'
+  repo: 'my-org/my-repo'
 )
 ```
 

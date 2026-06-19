@@ -1,24 +1,24 @@
-// Hawkeye Autonomous Pentest — Jenkins shared library global step.
+// Hawckeye Autonomous Pentest — Jenkins shared library global step.
 //
 // Configure this repo as a Global Pipeline Library named 'hawkeye'
 // (Manage Jenkins → System → Global Pipeline Libraries, point at this repo).
 //
 // Jenkinsfile:
-//   @Library('hawkeye') _
-//   hawkeye(
+//   @Library('hawckeye') _
+//   hawckeye(
 //     assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
-//     hawkeyeCredId: 'hawkeye-token', // Jenkins "Secret text" credential = Hawkeye API key
+//     hawkeyeCredId: 'hawkeye-token', // Jenkins "Secret text" credential = Hawckeye API key
 //     scmCredId: 'github-token',      // optional: posts a PR comment on multibranch PR builds
-//     repo: 'your-org/your-repo',     // required for PR comments
+//     repo: 'my-org/my-repo',     // required for PR comments
 //     failOn: 'none'                  // none|low|medium|high|critical|any
 //   )
 def call(Map cfg = [:]) {
-  String apiUrl     = cfg.apiUrl     ?: 'https://api.hawkeye.io'
+  String apiUrl     = cfg.apiUrl     ?: 'https://api.hawckeye.io'
   String assetId    = cfg.assetId    ?: ''
   String apk        = cfg.apk        ?: ''
   String failOn     = cfg.failOn     ?: 'none'
   String clientRef  = cfg.clientRef  ?: 'v1'
-  String clientBase = cfg.clientBase ?: 'https://raw.githubusercontent.com/your-org/hawkeye-ci'
+  String clientBase = cfg.clientBase ?: 'https://raw.githubusercontent.com/hawckeye-official/hawckeye-ci'
   String hawkeyeCred = cfg.hawkeyeCredId ?: 'hawkeye-token'
   String scmCred    = cfg.scmCredId  ?: ''
   String repo       = cfg.repo       ?: ''

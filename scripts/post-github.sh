@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Posts/updates a single sticky PR comment with the Hawkeye report.
-# Uses the caller's GITHUB_TOKEN — Hawkeye never needs inbound repo access.
+# Posts/updates a single sticky PR comment with the Hawckeye report.
+# Uses the caller's GITHUB_TOKEN — Hawckeye never needs inbound repo access.
 set -euo pipefail
 
 report="${1:-hawkeye-report.md}"

@@ -1,11 +1,11 @@
-# Hawkeye Autonomous Pentest — Azure Pipelines steps template.
+# Hawckeye Autonomous Pentest — Azure Pipelines steps template.
 # Quick adopt (no Marketplace extension needed). In a consumer pipeline:
 #
 #   resources:
 #     repositories:
 #       - repository: hawkeye
 #         type: github            # or git (Azure Repos)
-#         name: your-org/hawkeye-ci
+#         name: hawckeye-official/hawckeye-ci
 #         ref: refs/tags/v1
 #   steps:
 #     - template: azure/hawkeye-steps.yml@hawkeye
@@ -22,7 +22,7 @@ parameters:
     default: ''
   - name: apiUrl
     type: string
-    default: 'https://api.hawkeye.io'
+    default: 'https://api.hawckeye.io'
   - name: wait
     type: string
     default: 'true'
@@ -40,7 +40,7 @@ parameters:
     default: 'v1'
   - name: clientBase
     type: string
-    default: 'https://raw.githubusercontent.com/your-org/hawkeye-ci'
+    default: 'https://raw.githubusercontent.com/hawckeye-official/hawckeye-ci'
 
 steps:
   - bash: |
@@ -57,7 +57,7 @@ steps:
       export HAWKEYE_FINDINGS_COUNT="$(jq '(.findings // []) | length' hawkeye-findings.json)"
       export HAWKEYE_MAX_SEVERITY="$(jq -r 'def r:{info:0,low:1,medium:2,high:3,critical:4}[(.|ascii_downcase)]//0; ((.findings//[])|map((.severity//"info")|r)|max//0) as $m|["info","low","medium","high","critical"][$m]' hawkeye-findings.json)"
       bash .hawkeye/gate.sh
-    displayName: 'Hawkeye Autonomous Pentest'
+    displayName: 'Hawckeye Autonomous Pentest'
     continueOnError: ${{ parameters.nonBlocking }}
     env:
       HAWKEYE_API: ${{ parameters.apiUrl }}

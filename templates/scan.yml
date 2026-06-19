@@ -1,8 +1,8 @@
-# Hawkeye Autonomous Pentest — GitLab CI/CD Component.
+# Hawckeye Autonomous Pentest — GitLab CI/CD Component.
 # Usage in a consumer .gitlab-ci.yml:
 #
 #   include:
-#     - component: $CI_SERVER_FQDN/your-org/hawkeye-ci/scan@1
+#     - component: $CI_SERVER_FQDN/hawckeye-official/hawckeye-ci/scan@1
 #       inputs:
 #         asset-id: "as_9f3..."        # or apk: "build/app-release.apk"
 #
@@ -16,7 +16,7 @@ spec:
       default: ""
       description: "Path to an APK artifact. Use this OR asset-id."
     api-url:
-      default: "https://api.hawkeye.io"
+      default: "https://api.hawckeye.io"
     wait:
       default: "true"
     timeout:
@@ -30,9 +30,9 @@ spec:
       default: "alpine:3.20"
     client-ref:
       default: "v1"
-      description: "Tag of hawkeye-ci to fetch the engine-free client scripts from."
+      description: "Tag of hawckeye-ci to fetch the engine-free client scripts from."
     client-base:
-      default: "https://gitlab.com/your-org/hawkeye-ci/-/raw"
+      default: "https://gitlab.com/hawckeye-official/hawckeye-ci/-/raw"
 ---
 hawkeye-scan:
   stage: $[[ inputs.stage ]]

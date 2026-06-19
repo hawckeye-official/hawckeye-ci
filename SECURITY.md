@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **security@hawkeye.io**. Please do not open public issues for security
+Email **security@hawckeye.io**. Please do not open public issues for security
 reports. We aim to acknowledge within 2 business days.
 
 ## What runs in your pipeline
@@ -14,11 +14,11 @@ network calls it makes.
 
 ## Tokens & scopes
 
-- `HAWKEYE_TOKEN` — your Hawkeye API key. Store it as a masked CI secret. It is
+- `HAWKEYE_TOKEN` — your Hawckeye API key. Store it as a masked CI secret. It is
   scoped to **your** authorized assets only.
 - `GITHUB_TOKEN` / `GITLAB_TOKEN` — used by the client to post the report
   comment. Minimum scopes: GitHub `pull-requests: write`; GitLab `api` (for the
-  MR note). Hawkeye never receives these tokens.
+  MR note). Hawckeye never receives these tokens.
 
 ## Authorization model
 

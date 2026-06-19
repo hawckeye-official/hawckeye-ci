@@ -11,7 +11,7 @@ resources:
   repositories:
     - repository: hawkeye
       type: github          # or 'git' for Azure Repos
-      name: your-org/hawkeye-ci
+      name: hawckeye-official/hawckeye-ci
       endpoint: your-github-service-connection
       ref: refs/tags/v1
 

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Hawkeye CI — core trigger client (engine-free).
+# Hawckeye CI — core trigger client (engine-free).
 #
-# Starts a pentest scan on the hosted Hawkeye API against an AUTHORIZED target
+# Starts a pentest scan on the hosted Hawckeye API against an AUTHORIZED target
 # (a registered URL asset, or an uploaded APK), waits for completion, and writes
 # hawkeye-findings.json + hawkeye-report.md. Contains no scanning logic — it only
 # calls the API, so it is safe to run on any untrusted CI runner and to open-source.
 #
 # Required env:
-#   HAWKEYE_TOKEN        Hawkeye API key
+#   HAWKEYE_TOKEN        Hawckeye API key
 #   HAWKEYE_ASSET_ID     registered authorized asset id (URL target)   ─┐ one of
 #   HAWKEYE_APK          path to an APK artifact to scan               ─┘ these
 # Optional env:
-#   HAWKEYE_API          API base url        (default https://api.hawkeye.io)
+#   HAWKEYE_API          API base url        (default https://api.hawckeye.io)
 #   HAWKEYE_WAIT         true|false          (default true)
 #   HAWKEYE_TIMEOUT      seconds to wait     (default 1800)
 #   HAWKEYE_POLL_INTERVAL seconds            (default 15)
@@ -19,7 +19,7 @@
 #   HAWKEYE_OUTPUT_DIR   where to write outputs (default .)
 set -euo pipefail
 
-: "${HAWKEYE_API:=https://api.hawkeye.io}"
+: "${HAWKEYE_API:=https://api.hawckeye.io}"
 : "${HAWKEYE_WAIT:=true}"
 : "${HAWKEYE_TIMEOUT:=1800}"
 : "${HAWKEYE_POLL_INTERVAL:=15}"
@@ -106,7 +106,7 @@ report="$HAWKEYE_OUTPUT_DIR/hawkeye-report.md"
 results_url="${HAWKEYE_API%/}/scans/$scan_id"
 {
   echo "<!-- hawkeye-report -->"
-  echo "## 🦅 Hawkeye Autonomous Pentest"
+  echo "## 🦅 Hawckeye Autonomous Pentest"
   echo
   echo "**Scan** \`$scan_id\` · **Status** \`$status\` · **Findings** $count"
   echo

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Posts/updates a single sticky PR thread on Azure DevOps with the Hawkeye report.
+# Posts/updates a single sticky PR thread on Azure DevOps with the Hawckeye report.
 # Requires SYSTEM_ACCESSTOKEN (enable "Allow scripts to access the OAuth token"
 # on the job, and grant the build service "Contribute to pull requests").
 set -euo pipefail

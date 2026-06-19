@@ -13,12 +13,12 @@ performs no scanning. When it runs in your pipeline it makes only these calls:
 
 What it does **not** do:
 
-- It does **not** send your source code, repository contents, or secrets to Hawkeye.
-- It does **not** grant Hawkeye inbound access to your repo — comments are posted
+- It does **not** send your source code, repository contents, or secrets to Hawckeye.
+- It does **not** grant Hawckeye inbound access to your repo — comments are posted
   by the client using your own `GITHUB_TOKEN` / `GITLAB_TOKEN`.
 - It targets **only** assets you pre-registered and authorized. The API rejects
   anything not on your allowlist.
 
 You can read every line that runs: see `scripts/` in this repository.
 
-Questions: security@hawkeye.io
+Questions: security@hawckeye.io

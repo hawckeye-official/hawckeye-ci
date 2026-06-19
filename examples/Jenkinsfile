@@ -1,16 +1,16 @@
 // Consumer Jenkinsfile (multibranch pipeline recommended for PR comments).
-@Library('hawkeye') _
+@Library('hawckeye') _
 
 pipeline {
   agent any
   stages {
-    stage('Hawkeye Pentest') {
+    stage('Hawckeye Pentest') {
       steps {
-        hawkeye(
+        hawckeye(
           assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
-          hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawkeye API key
+          hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawckeye API key
           scmCredId: 'github-token',      // optional: PR comments
-          repo: 'your-org/your-repo'
+          repo: 'my-org/my-repo'
           // failOn: 'high'
         )
       }

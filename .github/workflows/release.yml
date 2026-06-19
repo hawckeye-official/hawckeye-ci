@@ -1,5 +1,5 @@
 # Keeps the floating major tag (v1) pointed at the latest v1.x.y release,
-# so consumers can pin `your-org/hawkeye-ci@v1`.
+# so consumers can pin `hawckeye-official/hawckeye-ci@v1`.
 # Marketplace publishing itself is a one-time manual step: edit the GitHub
 # Release and tick "Publish this Action to the GitHub Marketplace".
 name: release

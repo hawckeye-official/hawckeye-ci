@@ -1,13 +1,13 @@
-name: "Hawkeye Autonomous Pentest"
-description: "Trigger a Hawkeye pentest against an authorized URL or APK and report findings on the PR. Non-blocking by default."
-author: "Hawkeye"
+name: "Hawckeye Autonomous Pentest"
+description: "Trigger a Hawckeye pentest against an authorized URL or APK and report findings on the PR. Non-blocking by default."
+author: "Hawckeye"
 branding:
   icon: "shield"
   color: "purple"
 
 inputs:
   token:
-    description: "Hawkeye API key (store as a repo/org secret)."
+    description: "Hawckeye API key (store as a repo/org secret)."
     required: true
   asset-id:
     description: "Registered authorized asset id (URL target). Use this OR apk."
@@ -18,9 +18,9 @@ inputs:
     required: false
     default: ""
   api-url:
-    description: "Hawkeye API base URL."
+    description: "Hawckeye API base URL."
     required: false
-    default: "https://api.hawkeye.io"
+    default: "https://api.hawckeye.io"
   wait:
     description: "Wait for the scan to finish before posting results."
     required: false
@@ -44,7 +44,7 @@ inputs:
 
 outputs:
   scan-id:
-    description: "The Hawkeye scan id."
+    description: "The Hawckeye scan id."
     value: ${{ steps.scan.outputs.scan_id }}
   status:
     description: "Final scan status."
