@@ -1,5 +1,5 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
+  "id": "c1a3be30-1420-4a83-9c29-97f9afef11ec",
   "name": "Hawkeye",
   "friendlyName": "Hawkeye Autonomous Pentest",
   "description": "Trigger a Hawkeye pentest against an authorized URL or APK and report findings on the PR.",
