@@ -1,7 +1,6 @@
-# Consumer pipeline (Azure DevOps). Define a secret variable HAWKEYE_TOKEN.
-# Linux agent required (bash/curl/jq).
-trigger: none
-pr:
+# Consumer pipeline (Azure DevOps). Run Hawckeye AFTER deploy to a test env.
+# Define a secret variable HAWKEYE_TOKEN. Linux agent required (bash/curl/jq).
+trigger:
   - main
 
 pool:
@@ -9,14 +8,15 @@ pool:
 
 resources:
   repositories:
-    - repository: hawkeye
+    - repository: hawckeye
       type: github          # or 'git' for Azure Repos
       name: hawckeye-official/hawckeye-ci
       endpoint: your-github-service-connection
       ref: refs/tags/v1
 
 steps:
-  - template: azure/hawkeye-steps.yml@hawkeye
+  # ...your deploy steps here, producing the test env URL...
+  - template: azure/hawkeye-steps.yml@hawckeye
     parameters:
-      assetId: 'as_9f3c...'     # or apk: 'build/app-release.apk'
-      # failOn: high            # gate the build (also set nonBlocking: false)
+      environmentUrl: 'https://staging.my-app.com'   # or assetId / apk
+      scans: 'security,qa,friction'

@@ -2,7 +2,7 @@
   "id": "c1a3be30-1420-4a83-9c29-97f9afef11ec",
   "name": "Hawckeye",
   "friendlyName": "Hawckeye",
-  "description": "Autonomously tests an authorized URL or APK for security, QA, and product-friction issues and reports findings on the PR.",
+  "description": "Run Hawckeye (security, QA, product-friction) against a deployed env or APK after deploy. Results go to your dashboard, Linear, and email.",
   "helpMarkDown": "Set a secret variable HAWKEYE_TOKEN. Requires a Linux agent with bash/curl/jq.",
   "category": "Utility",
   "author": "Hawckeye",
@@ -10,12 +10,12 @@
   "instanceNameFormat": "Hawckeye scan",
   "inputs": [
     { "name": "token", "type": "string", "label": "Hawckeye API key", "required": true, "helpMarkDown": "Use $(HAWKEYE_TOKEN) from a secret variable." },
-    { "name": "assetId", "type": "string", "label": "Asset id (URL target)", "required": false, "helpMarkDown": "Use this OR apk." },
-    { "name": "apk", "type": "string", "label": "APK path", "required": false, "helpMarkDown": "Use this OR assetId." },
+    { "name": "environmentUrl", "type": "string", "label": "Environment URL", "required": false, "helpMarkDown": "Freshly-deployed env to scan (web). Use this OR assetId OR apk." },
+    { "name": "assetId", "type": "string", "label": "Asset id", "required": false, "helpMarkDown": "Use this OR environmentUrl OR apk." },
+    { "name": "apk", "type": "string", "label": "APK path", "required": false, "helpMarkDown": "Use this OR environmentUrl OR assetId." },
+    { "name": "scans", "type": "string", "label": "Scan suites", "defaultValue": "security,qa,friction", "required": false, "helpMarkDown": "Comma list: security,qa,friction" },
     { "name": "apiUrl", "type": "string", "label": "API URL", "defaultValue": "https://api.hawckeye.com", "required": false },
-    { "name": "wait", "type": "string", "label": "Wait for completion", "defaultValue": "true", "required": false },
-    { "name": "timeout", "type": "string", "label": "Timeout (s)", "defaultValue": "1800", "required": false },
-    { "name": "failOn", "type": "string", "label": "Fail on", "defaultValue": "none", "required": false, "helpMarkDown": "none|low|medium|high|critical|any" }
+    { "name": "wait", "type": "string", "label": "Wait for completion", "defaultValue": "false", "required": false }
   ],
   "execution": {
     "Node20_1": { "target": "run.js" }

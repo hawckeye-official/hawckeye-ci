@@ -1,17 +1,17 @@
-// Consumer Jenkinsfile (multibranch pipeline recommended for PR comments).
+// Consumer Jenkinsfile. Run Hawckeye AFTER deploying to a test env.
+// Results go to your dashboard, Linear, and email.
 @Library('hawckeye') _
 
 pipeline {
   agent any
   stages {
+    // ...your deploy stage here...
     stage('Hawckeye') {
       steps {
         hawckeye(
-          assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
-          hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawckeye API key
-          scmCredId: 'github-token',      // optional: PR comments
-          repo: 'my-org/my-repo'
-          // failOn: 'high'
+          environmentUrl: 'https://staging.my-app.com', // or apk: 'build/app-release.apk'
+          scans: 'security,qa,friction',
+          hawkeyeCredId: 'hawckeye-token'               // Secret text = Hawckeye API key
         )
       }
     }

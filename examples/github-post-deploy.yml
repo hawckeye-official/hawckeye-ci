@@ -1,0 +1,36 @@
+# Run Hawckeye AFTER deploying to a test/staging environment.
+# Results go to your Hawckeye dashboard, Linear, and email — not the PR.
+name: Hawckeye
+on:
+  push:
+    branches: [main]          # post-merge: deploy, then scan the deployed env
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - id: deploy
+        run: |
+          # ...your real deploy step here...
+          echo "url=https://staging.my-app.com" >> "$GITHUB_OUTPUT"
+
+  hawckeye:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      # WEB: scan the freshly-deployed environment
+      - uses: hawckeye-official/hawckeye-ci@v1
+        with:
+          token: ${{ secrets.HAWCKEYE_TOKEN }}
+          environment-url: ${{ needs.deploy.outputs.url }}
+          scans: security,qa,friction      # pick any subset
+
+      # MOBILE alternative: build the APK earlier, then point at the file
+      # - uses: actions/download-artifact@v4
+      #   with: { name: app-release }
+      # - uses: hawckeye-official/hawckeye-ci@v1
+      #   with:
+      #     token: ${{ secrets.HAWCKEYE_TOKEN }}
+      #     apk: app-release.apk

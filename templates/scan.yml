@@ -1,72 +1,60 @@
-# Hawckeye — GitLab CI/CD Component.
-# Usage in a consumer .gitlab-ci.yml:
+# Hawckeye — GitLab CI/CD Component. Run AFTER a deploy to a test/staging env.
+# Results go to your dashboard, Linear, and email — not the MR.
 #
 #   include:
 #     - component: $CI_SERVER_FQDN/hawckeye-official/hawckeye-ci/scan@1
 #       inputs:
-#         asset-id: "as_9f3..."        # or apk: "build/app-release.apk"
+#         environment-url: "https://staging.my-app.com"   # or asset-id / apk
 #
-# Set CI/CD variables: HAWKEYE_TOKEN (masked) and GITLAB_TOKEN (api scope, for the MR note).
+# Set CI/CD variable HAWKEYE_TOKEN (masked).
 spec:
   inputs:
+    environment-url:
+      default: ""
+      description: "Freshly-deployed environment to scan (web). Use this OR asset-id OR apk."
     asset-id:
       default: ""
-      description: "Registered authorized asset id (URL target). Use this OR apk."
     apk:
       default: ""
-      description: "Path to an APK artifact. Use this OR asset-id."
+    scans:
+      default: "security,qa,friction"
     api-url:
       default: "https://api.hawckeye.com"
     wait:
-      default: "true"
-    timeout:
-      default: "1800"
-    fail-on:
-      default: "none"
-      description: "none|low|medium|high|critical|any. Default none (report-only)."
+      default: "false"
     stage:
-      default: "test"
+      default: "scan"
     image:
       default: "alpine:3.20"
     client-ref:
       default: "v1"
-      description: "Tag of hawckeye-ci to fetch the engine-free client scripts from."
     client-base:
       default: "https://gitlab.com/hawckeye-official/hawckeye-ci/-/raw"
 ---
-hawkeye-scan:
+hawckeye:
   stage: $[[ inputs.stage ]]
   image: $[[ inputs.image ]]
-  allow_failure: true            # non-blocking by default
+  allow_failure: true
   rules:
-    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   variables:
     HAWKEYE_API: "$[[ inputs.api-url ]]"
+    HAWKEYE_ENVIRONMENT_URL: "$[[ inputs.environment-url ]]"
     HAWKEYE_ASSET_ID: "$[[ inputs.asset-id ]]"
     HAWKEYE_APK: "$[[ inputs.apk ]]"
+    HAWKEYE_SCANS: "$[[ inputs.scans ]]"
     HAWKEYE_WAIT: "$[[ inputs.wait ]]"
-    HAWKEYE_TIMEOUT: "$[[ inputs.timeout ]]"
-    HAWKEYE_FAIL_ON: "$[[ inputs.fail-on ]]"
     HAWKEYE_REF: "$CI_COMMIT_SHA"
-    HAWKEYE_OUTPUT_DIR: "."
+    HAWKEYE_METADATA: '{"branch":"$CI_COMMIT_BRANCH","actor":"$GITLAB_USER_LOGIN","project":"$CI_PROJECT_PATH","run_url":"$CI_PIPELINE_URL"}'
     CLIENT_URL: "$[[ inputs.client-base ]]/$[[ inputs.client-ref ]]/scripts"
   before_script:
-    - command -v bash >/dev/null || apk add --no-cache bash >/dev/null
-    - apk add --no-cache curl jq >/dev/null 2>&1 || (apt-get update -qq && apt-get install -y -qq curl jq) || true
+    - command -v jq >/dev/null || apk add --no-cache bash curl jq >/dev/null 2>&1 || (apt-get update -qq && apt-get install -y -qq bash curl jq)
     - mkdir -p .hawkeye
     - curl -fsSL "$CLIENT_URL/hawkeye-core.sh" -o .hawkeye/core.sh
-    - curl -fsSL "$CLIENT_URL/post-gitlab.sh" -o .hawkeye/post.sh
-    - curl -fsSL "$CLIENT_URL/gate.sh"         -o .hawkeye/gate.sh
-    - chmod +x .hawkeye/*.sh
+    - chmod +x .hawkeye/core.sh
   script:
     - bash .hawkeye/core.sh
-    - bash .hawkeye/post.sh hawkeye-report.md
-    - >
-      HAWKEYE_FINDINGS_COUNT="$(jq '(.findings // []) | length' hawkeye-findings.json)"
-      HAWKEYE_MAX_SEVERITY="$(jq -r 'def r:{info:0,low:1,medium:2,high:3,critical:4}[(.|ascii_downcase)]//0; ((.findings//[])|map((.severity//"info")|r)|max//0) as $m|["info","low","medium","high","critical"][$m]' hawkeye-findings.json)"
-      bash .hawkeye/gate.sh
   artifacts:
     when: always
     paths:
-      - hawkeye-findings.json
-      - hawkeye-report.md
+      - hawkeye-scan-id.txt

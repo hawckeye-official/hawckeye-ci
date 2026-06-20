@@ -1,5 +1,5 @@
 name: "Hawckeye"
-description: "Autonomously tests an authorized URL or APK for security, QA, and product-friction issues and reports findings on the PR. Non-blocking by default."
+description: "Autonomously tests an authorized URL or APK for security, QA, and product-friction issues after deploy. Fire-and-forget; results go to your dashboard, Linear, and email."
 author: "Hawckeye"
 branding:
   icon: "shield"
@@ -9,52 +9,45 @@ inputs:
   token:
     description: "Hawckeye API key (store as a repo/org secret)."
     required: true
+  environment-url:
+    description: "Freshly-deployed test/staging URL to scan (web). Use this OR asset-id OR apk."
+    required: false
+    default: ""
   asset-id:
-    description: "Registered authorized asset id (URL target). Use this OR apk."
+    description: "Registered authorized asset id. Use this OR environment-url OR apk."
     required: false
     default: ""
   apk:
-    description: "Path to an APK artifact to scan. Use this OR asset-id."
+    description: "Path to an APK artifact to scan (mobile). Use this OR environment-url OR asset-id."
     required: false
     default: ""
+  scans:
+    description: "Comma list of suites to run: security,qa,friction (default all)."
+    required: false
+    default: "security,qa,friction"
   api-url:
     description: "Hawckeye API base URL."
     required: false
     default: "https://api.hawckeye.com"
   wait:
-    description: "Wait for the scan to finish before posting results."
+    description: "Wait for the scan to finish so the job reflects status (default false = fire-and-forget)."
     required: false
-    default: "true"
+    default: "false"
   timeout:
-    description: "Max seconds to wait for an async scan."
+    description: "Max seconds to wait when wait=true."
     required: false
     default: "1800"
-  fail-on:
-    description: "Fail the step on findings: none|low|medium|high|critical|any. Default none (report-only)."
-    required: false
-    default: "none"
-  comment:
-    description: "Post a sticky PR comment with results."
-    required: false
-    default: "true"
-  github-token:
-    description: "Token used to post the PR comment."
-    required: false
-    default: ${{ github.token }}
 
 outputs:
   scan-id:
     description: "The Hawckeye scan id."
     value: ${{ steps.scan.outputs.scan_id }}
   status:
-    description: "Final scan status."
+    description: "Scan status (queued unless wait=true)."
     value: ${{ steps.scan.outputs.status }}
-  findings-count:
-    description: "Number of findings."
-    value: ${{ steps.scan.outputs.findings_count }}
-  max-severity:
-    description: "Highest finding severity."
-    value: ${{ steps.scan.outputs.max_severity }}
+  dashboard-url:
+    description: "Where to watch/inspect this scan."
+    value: ${{ steps.scan.outputs.dashboard_url }}
 
 runs:
   using: "composite"
@@ -64,25 +57,13 @@ runs:
       env:
         HAWKEYE_API: ${{ inputs.api-url }}
         HAWKEYE_TOKEN: ${{ inputs.token }}
+        HAWKEYE_ENVIRONMENT_URL: ${{ inputs.environment-url }}
         HAWKEYE_ASSET_ID: ${{ inputs.asset-id }}
         HAWKEYE_APK: ${{ inputs.apk }}
+        HAWKEYE_SCANS: ${{ inputs.scans }}
         HAWKEYE_WAIT: ${{ inputs.wait }}
         HAWKEYE_TIMEOUT: ${{ inputs.timeout }}
         HAWKEYE_REF: ${{ github.sha }}
+        HAWKEYE_METADATA: >-
+          {"branch":"${{ github.ref_name }}","actor":"${{ github.actor }}","repo":"${{ github.repository }}","run_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
       run: bash "${{ github.action_path }}/scripts/hawkeye-core.sh"
-
-    - id: comment
-      if: ${{ inputs.comment == 'true' && always() }}
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-      run: bash "${{ github.action_path }}/scripts/post-github.sh" "${{ steps.scan.outputs.report_file }}"
-
-    - id: gate
-      if: ${{ inputs.fail-on != 'none' && always() }}
-      shell: bash
-      env:
-        HAWKEYE_FAIL_ON: ${{ inputs.fail-on }}
-        HAWKEYE_FINDINGS_COUNT: ${{ steps.scan.outputs.findings_count }}
-        HAWKEYE_MAX_SEVERITY: ${{ steps.scan.outputs.max_severity }}
-      run: bash "${{ github.action_path }}/scripts/gate.sh"

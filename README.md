@@ -1,8 +1,9 @@
 # Hawckeye — CI integration
 
 Run [Hawckeye](https://hawckeye.com) — autonomous **security, QA & product-friction**
-testing — against an **authorized URL or APK** from your CI, and get findings posted
-back to the PR/MR. Non-blocking by default.
+testing — against an **authorized URL or APK** after you deploy to a test/staging
+environment. **Fire-and-forget:** the CI step triggers the scan and returns; results
+are delivered to your **dashboard, Linear, and email** — not the PR.
 
 This repository is the **engine-free trigger client**. It contains no scanning
 logic — it only calls the hosted Hawckeye API, so it is safe to run on any runner.
@@ -11,107 +12,107 @@ The engine runs entirely on Hawckeye's infrastructure.
 ## How it works
 
 ```
-Your CI ──POST /v1/scans {asset_id|apk}──▶ Hawckeye API ──▶ engine runs the scan
-   ▲                                                              │
-   └──────────────── sticky PR/MR comment ◀── poll /findings ─────┘
+deploy to test env ──▶ CI step ──POST /v1/scans {environment_url|apk, scans}──▶ Hawckeye
+                                                                                   │
+   dashboard (always) + Linear issues + email digest  ◀── engine runs the scan ───┘
 ```
 
-You can only scan targets pre-registered as **authorized assets** during
-onboarding. The API rejects anything not on your allowlist.
+Why post-deploy, not on the PR? The scans need a **running instance** of your product,
+and they run **after merge/deploy** — so findings are tracked work items (Linear),
+not PR comments. You can only scan targets pre-registered as **authorized assets**;
+the API rejects anything not on your allowlist.
+
+Three suites, pick any subset via `scans`: **security**, **qa**, **friction**.
 
 ## Setup (once)
 
 1. Get a **Hawckeye API key** → store it as a CI secret named `HAWKEYE_TOKEN`.
-2. Register your target (URL or mobile app) → you receive an **`asset-id`**.
-3. Add the snippet below.
+2. Register your target + connect **Linear** / notification emails → you get an asset.
+3. Add the snippet below **after your deploy step**.
 
 ## GitHub Actions
 
 ```yaml
-# .github/workflows/hawkeye.yml
-on: [pull_request]
-permissions: { pull-requests: write, contents: read }
+# .github/workflows/hawckeye.yml — run after deploy
+on:
+  push: { branches: [main] }
 jobs:
-  hawkeye:
+  hawckeye:
     runs-on: ubuntu-latest
     steps:
+      # ...deploy to your test env, exposing its URL...
       - uses: hawckeye-official/hawckeye-ci@v1
         with:
           token: ${{ secrets.HAWKEYE_TOKEN }}
-          asset-id: "as_9f3c..."   # or  apk: app-release.apk
+          environment-url: "https://staging.my-app.com"   # or asset-id / apk
+          scans: security,qa,friction
 ```
 
 | Input | Default | Notes |
 |---|---|---|
 | `token` | — | **required**, Hawckeye API key |
-| `asset-id` / `apk` | — | one is required |
+| `environment-url` / `asset-id` / `apk` | — | one is required |
+| `scans` | `security,qa,friction` | comma list of suites |
 | `api-url` | `https://api.hawckeye.com` | |
-| `wait` | `true` | wait for the scan to finish |
-| `timeout` | `1800` | seconds |
-| `fail-on` | `none` | `none\|low\|medium\|high\|critical\|any` |
-| `comment` | `true` | post sticky PR comment |
+| `wait` | `false` | fire-and-forget; set `true` to make the job reflect status |
+| `timeout` | `1800` | seconds (only when `wait=true`) |
+
+See `examples/github-post-deploy.yml` for the full deploy→scan job.
 
 ## GitLab CI
 
 ```yaml
-# .gitlab-ci.yml — set HAWKEYE_TOKEN and GITLAB_TOKEN (api scope) as CI variables
+# .gitlab-ci.yml — set HAWKEYE_TOKEN (masked). Runs on the default branch.
 include:
   - component: $CI_SERVER_FQDN/hawckeye-official/hawckeye-ci/scan@1
     inputs:
-      asset-id: "as_9f3c..."   # or  apk: "build/app-release.apk"
+      environment-url: "https://staging.my-app.com"   # or asset-id / apk
 ```
-
-> `GITLAB_TOKEN` needs `api` scope to post the MR note (the default
-> `CI_JOB_TOKEN` cannot create notes).
 
 ## Azure DevOps
 
-Quickest path — a steps template (Linux agent; set secret var `HAWKEYE_TOKEN`):
+Steps template (Linux agent; secret var `HAWKEYE_TOKEN`):
 
 ```yaml
 resources:
   repositories:
-    - repository: hawkeye
+    - repository: hawckeye
       type: github
       name: hawckeye-official/hawckeye-ci
       endpoint: your-github-service-connection
       ref: refs/tags/v1
 steps:
-  - template: azure/hawkeye-steps.yml@hawkeye
+  - template: azure/hawkeye-steps.yml@hawckeye
     parameters:
-      assetId: "as_9f3c..."   # or apk: "build/app-release.apk"
+      environmentUrl: "https://staging.my-app.com"   # or assetId / apk
 ```
 
 A Marketplace **task extension** (`Hawckeye@1`) is scaffolded under
 `azure-devops-extension/` — run `build.sh` (needs `tfx-cli`) to package it.
-Enable *Allow scripts to access the OAuth token* so PR comments can post.
 
 ## Jenkins
 
-Add this repo as a Global Pipeline Library named `hawkeye`, then:
+Add this repo as a Global Pipeline Library named `hawckeye`, then:
 
 ```groovy
 @Library('hawckeye') _
 hawckeye(
-  assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
-  hawkeyeCredId: 'hawkeye-token', // Secret text credential = Hawckeye API key
-  scmCredId: 'github-token',      // optional: PR comments on multibranch builds
-  repo: 'my-org/my-repo'
+  environmentUrl: 'https://staging.my-app.com', // or apk: 'build/app-release.apk'
+  scans: 'security,qa,friction',
+  hawkeyeCredId: 'hawckeye-token'               // Secret text = Hawckeye API key
 )
 ```
 
 ## How the wrappers share one core
 
-Every platform runs the same engine-free scripts under `scripts/`
-(`hawkeye-core.sh` → `post-<platform>.sh` → `gate.sh`). GitHub bundles them via
-the action; GitLab/Azure/Jenkins fetch them from the pinned release tag. One
-codebase, four platforms.
+Every platform runs the same engine-free `scripts/hawkeye-core.sh` (trigger +
+fire-and-forget). GitHub bundles it via the action; GitLab/Azure/Jenkins fetch it
+from the pinned release tag. One codebase, four platforms.
 
 ## Publishing (maintainers)
 
 - **GitHub Marketplace** — tag `vX.Y.Z`; the `release` workflow floats `v1`. Then
   edit the GitHub Release and tick *“Publish this Action to the GitHub Marketplace.”*
-  Requires `action.yml` with `branding` (present) and a public repo.
 - **GitLab CI/CD Catalog** — enable *Settings → General → CI/CD Catalog resource*,
   then push a semver tag; `.gitlab-ci.yml` creates the catalog release.
 
