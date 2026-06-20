@@ -21,6 +21,12 @@
 #   HAWKEYE_TIMEOUT       seconds to wait when WAIT=true (default 1800)
 #   HAWKEYE_POLL_INTERVAL seconds between polls (default 15)
 #   HAWKEYE_OUTPUT_DIR    where to write the scan id (default .)
+#   Readiness gate (web only — waits until the deploy is live before scanning):
+#   HAWKEYE_WAIT_FOR_URL  true|false (default false)
+#   HAWKEYE_EXPECTED_REF  commit sha the env must report (via VERSION_PATH) before scanning
+#   HAWKEYE_VERSION_PATH  path returning the deployed sha, e.g. /version (health-check only if unset)
+#   HAWKEYE_READY_TIMEOUT seconds to wait for readiness (default 600)
+#   HAWKEYE_READY_INTERVAL seconds between readiness polls (default 15)
 set -euo pipefail
 
 : "${HAWKEYE_API:=https://api.hawckeye.com}"
@@ -51,6 +57,36 @@ api() {
 }
 
 mkdir -p "$HAWKEYE_OUTPUT_DIR"
+
+# --- Readiness gate: wait until the deploy is live (and serving the right build) ---
+# Solves "deploy takes N minutes" without a magic timer — works on every platform.
+if [ "${HAWKEYE_WAIT_FOR_URL:-false}" = "true" ]; then
+  url="${HAWKEYE_ENVIRONMENT_URL:-}"
+  [ -n "$url" ] || die "HAWKEYE_WAIT_FOR_URL=true requires HAWKEYE_ENVIRONMENT_URL"
+  : "${HAWKEYE_READY_TIMEOUT:=600}"
+  : "${HAWKEYE_READY_INTERVAL:=15}"
+  want="${HAWKEYE_EXPECTED_REF:-}"
+  vpath="${HAWKEYE_VERSION_PATH:-}"
+  short="$(printf '%s' "$want" | cut -c1-7)"
+  echo "hawkeye: waiting for $url to be ready${want:+ at ref ${short}}"
+  rdeadline=$(( $(date +%s) + HAWKEYE_READY_TIMEOUT ))
+  while :; do
+    if [ -n "$want" ] && [ -n "$vpath" ]; then
+      got="$(curl -fsS --max-time 10 "${url%/}${vpath}" 2>/dev/null || true)"
+      case "$got" in
+        *"$want"*|*"$short"*) echo "hawkeye: env is serving ${short}"; break ;;
+      esac
+      last="version='${got:-<no response>}'"
+    else
+      code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$url" 2>/dev/null || echo 000)"
+      case "$code" in 2??|3??) echo "hawkeye: env healthy (HTTP $code)"; break ;; esac
+      last="HTTP $code"
+    fi
+    [ "$(date +%s)" -lt "$rdeadline" ] || die "env not ready after ${HAWKEYE_READY_TIMEOUT}s (last: ${last:-unknown})"
+    echo "hawkeye: not ready (${last:-...}); retrying in ${HAWKEYE_READY_INTERVAL}s"
+    sleep "$HAWKEYE_READY_INTERVAL"
+  done
+fi
 
 # --- Common fields: scan suites + ref + build metadata ---------------------
 base="$(jq -nc \

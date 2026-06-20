@@ -15,7 +15,10 @@
     { "name": "apk", "type": "string", "label": "APK path", "required": false, "helpMarkDown": "Use this OR environmentUrl OR assetId." },
     { "name": "scans", "type": "string", "label": "Scan suites", "defaultValue": "security,qa,friction", "required": false, "helpMarkDown": "Comma list: security,qa,friction" },
     { "name": "apiUrl", "type": "string", "label": "API URL", "defaultValue": "https://api.hawckeye.com", "required": false },
-    { "name": "wait", "type": "string", "label": "Wait for completion", "defaultValue": "false", "required": false }
+    { "name": "wait", "type": "string", "label": "Wait for completion", "defaultValue": "false", "required": false },
+    { "name": "waitForUrl", "type": "string", "label": "Wait for env to be live", "defaultValue": "false", "required": false, "helpMarkDown": "Poll environmentUrl until live before scanning." },
+    { "name": "expectedRef", "type": "string", "label": "Expected commit sha", "required": false, "helpMarkDown": "Defaults to the build sha." },
+    { "name": "versionPath", "type": "string", "label": "Version path", "required": false, "helpMarkDown": "Path returning the deployed sha, e.g. /version." }
   ],
   "execution": {
     "Node20_1": { "target": "run.js" }

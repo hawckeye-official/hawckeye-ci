@@ -37,6 +37,22 @@ inputs:
     description: "Max seconds to wait when wait=true."
     required: false
     default: "1800"
+  wait-for-url:
+    description: "Poll environment-url until it's live before scanning (handles slow deploys)."
+    required: false
+    default: "false"
+  expected-ref:
+    description: "Commit sha the env must report (via version-path) before scanning. Defaults to the workflow sha."
+    required: false
+    default: ${{ github.sha }}
+  version-path:
+    description: "Path on the env returning the deployed sha (e.g. /version). Health-check only if unset."
+    required: false
+    default: ""
+  ready-timeout:
+    description: "Max seconds to wait for the env to become ready."
+    required: false
+    default: "600"
 
 outputs:
   scan-id:
@@ -63,6 +79,10 @@ runs:
         HAWKEYE_SCANS: ${{ inputs.scans }}
         HAWKEYE_WAIT: ${{ inputs.wait }}
         HAWKEYE_TIMEOUT: ${{ inputs.timeout }}
+        HAWKEYE_WAIT_FOR_URL: ${{ inputs.wait-for-url }}
+        HAWKEYE_EXPECTED_REF: ${{ inputs.expected-ref }}
+        HAWKEYE_VERSION_PATH: ${{ inputs.version-path }}
+        HAWKEYE_READY_TIMEOUT: ${{ inputs.ready-timeout }}
         HAWKEYE_REF: ${{ github.sha }}
         HAWKEYE_METADATA: >-
           {"branch":"${{ github.ref_name }}","actor":"${{ github.actor }}","repo":"${{ github.repository }}","run_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}

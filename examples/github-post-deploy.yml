@@ -1,4 +1,5 @@
 # Run Hawckeye AFTER deploying to a test/staging environment.
+# Uses the readiness gate so a slow (e.g. 10-min) deploy is handled without a timer.
 # Results go to your Hawckeye dashboard, Linear, and email — not the PR.
 name: Hawckeye
 on:
@@ -13,24 +14,19 @@ jobs:
     steps:
       - id: deploy
         run: |
-          # ...your real deploy step here...
+          # ...kick off your deploy (may be async — that's fine, see wait-for-url below)...
           echo "url=https://staging.my-app.com" >> "$GITHUB_OUTPUT"
 
   hawckeye:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      # WEB: scan the freshly-deployed environment
       - uses: hawckeye-official/hawckeye-ci@v1
         with:
-          token: ${{ secrets.HAWCKEYE_TOKEN }}
+          token: ${{ secrets.HAWKEYE_TOKEN }}
           environment-url: ${{ needs.deploy.outputs.url }}
-          scans: security,qa,friction      # pick any subset
-
-      # MOBILE alternative: build the APK earlier, then point at the file
-      # - uses: actions/download-artifact@v4
-      #   with: { name: app-release }
-      # - uses: hawckeye-official/hawckeye-ci@v1
-      #   with:
-      #     token: ${{ secrets.HAWCKEYE_TOKEN }}
-      #     apk: app-release.apk
+          scans: security,qa,friction
+          wait-for-url: true            # poll until the env is live...
+          version-path: /version        # ...and serving THIS commit (no magic timer)
+          # expected-ref defaults to the workflow sha
+          ready-timeout: "900"          # give the deploy up to 15 min

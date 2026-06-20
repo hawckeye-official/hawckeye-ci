@@ -32,6 +32,15 @@ parameters:
   - name: wait
     type: string
     default: 'false'
+  - name: waitForUrl
+    type: string
+    default: 'false'
+  - name: expectedRef
+    type: string
+    default: ''
+  - name: versionPath
+    type: string
+    default: ''
   - name: clientRef
     type: string
     default: 'v1'
@@ -55,4 +64,7 @@ steps:
       HAWKEYE_APK: ${{ parameters.apk }}
       HAWKEYE_SCANS: ${{ parameters.scans }}
       HAWKEYE_WAIT: ${{ parameters.wait }}
+      HAWKEYE_WAIT_FOR_URL: ${{ parameters.waitForUrl }}
+      HAWKEYE_EXPECTED_REF: ${{ parameters.expectedRef }}
+      HAWKEYE_VERSION_PATH: ${{ parameters.versionPath }}
       HAWKEYE_REF: $(Build.SourceVersion)

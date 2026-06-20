@@ -1,0 +1,21 @@
+# Cleanest GitHub trigger: react to a successful deployment (Vercel/Netlify/Argo/etc.
+# post deployment statuses GitHub re-emits here). No timer, no polling — GitHub tells
+# you the instant the env is live and hands you its URL.
+name: Hawckeye
+on:
+  deployment_status:
+
+jobs:
+  hawckeye:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hawckeye-official/hawckeye-ci@v1
+        with:
+          token: ${{ secrets.HAWKEYE_TOKEN }}
+          environment-url: ${{ github.event.deployment_status.environment_url }}
+          scans: security,qa,friction
+          # optional belt-and-suspenders: confirm the right build is live
+          # wait-for-url: true
+          # version-path: /version
+          # expected-ref: ${{ github.event.deployment_status.deployment.sha }}

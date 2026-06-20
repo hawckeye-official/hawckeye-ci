@@ -22,6 +22,15 @@ spec:
       default: "https://api.hawckeye.com"
     wait:
       default: "false"
+    wait-for-url:
+      default: "false"
+      description: "Poll environment-url until live before scanning."
+    expected-ref:
+      default: ""
+      description: "Commit sha the env must report before scanning (defaults to CI_COMMIT_SHA at runtime)."
+    version-path:
+      default: ""
+      description: "Path returning the deployed sha, e.g. /version."
     stage:
       default: "scan"
     image:
@@ -44,6 +53,9 @@ hawckeye:
     HAWKEYE_APK: "$[[ inputs.apk ]]"
     HAWKEYE_SCANS: "$[[ inputs.scans ]]"
     HAWKEYE_WAIT: "$[[ inputs.wait ]]"
+    HAWKEYE_WAIT_FOR_URL: "$[[ inputs.wait-for-url ]]"
+    HAWKEYE_EXPECTED_REF: "$[[ inputs.expected-ref ]]"
+    HAWKEYE_VERSION_PATH: "$[[ inputs.version-path ]]"
     HAWKEYE_REF: "$CI_COMMIT_SHA"
     HAWKEYE_METADATA: '{"branch":"$CI_COMMIT_BRANCH","actor":"$GITLAB_USER_LOGIN","project":"$CI_PROJECT_PATH","run_url":"$CI_PIPELINE_URL"}'
     CLIENT_URL: "$[[ inputs.client-base ]]/$[[ inputs.client-ref ]]/scripts"

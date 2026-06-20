@@ -56,8 +56,24 @@ jobs:
 | `api-url` | `https://api.hawckeye.com` | |
 | `wait` | `false` | fire-and-forget; set `true` to make the job reflect status |
 | `timeout` | `1800` | seconds (only when `wait=true`) |
+| `wait-for-url` | `false` | poll `environment-url` until live before scanning |
+| `expected-ref` | `${{ github.sha }}` | env must report this sha (via `version-path`) before scanning |
+| `version-path` | — | path returning the deployed sha, e.g. `/version` (health-check only if unset) |
+| `ready-timeout` | `600` | max seconds to wait for the env to become ready |
 
-See `examples/github-post-deploy.yml` for the full deploy→scan job.
+See `examples/github-post-deploy.yml` (readiness gate) and
+`examples/github-deployment-status.yml` (native deploy-success trigger).
+
+### Handling slow deploys
+
+Deploys take time (often minutes) and finish asynchronously, so don't guess a timer.
+Either:
+- **GitHub only:** trigger `on: deployment_status` (state `success`) — fires the instant
+  the env is live and hands you the URL. See the example above.
+- **Any platform:** set `wait-for-url: true` (+ `version-path` + `expected-ref`). The
+  client polls until the env is healthy **and serving the expected commit**, then scans.
+  If it never becomes ready within `ready-timeout`, the step fails. This is the portable
+  option — same behavior on GitHub, GitLab, Azure, and Jenkins.
 
 ## GitLab CI
 

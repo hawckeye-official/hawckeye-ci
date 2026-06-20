@@ -16,6 +16,9 @@ const env = Object.assign({}, process.env, {
   HAWKEYE_APK: inp('apk'),
   HAWKEYE_SCANS: inp('scans', 'security,qa,friction'),
   HAWKEYE_WAIT: inp('wait', 'false'),
+  HAWKEYE_WAIT_FOR_URL: inp('waitForUrl', 'false'),
+  HAWKEYE_EXPECTED_REF: inp('expectedRef') || (process.env.BUILD_SOURCEVERSION || ''),
+  HAWKEYE_VERSION_PATH: inp('versionPath'),
   HAWKEYE_REF: process.env.BUILD_SOURCEVERSION || '',
 });
 
