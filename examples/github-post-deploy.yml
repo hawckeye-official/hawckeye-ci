@@ -24,7 +24,8 @@ jobs:
       - uses: hawckeye-official/hawckeye-ci@v1
         with:
           token: ${{ secrets.HAWKEYE_TOKEN }}
-          environment-url: ${{ needs.deploy.outputs.url }}
+          asset-id: "as_9f3c..."                 # required: your verified, authorized asset
+          environment-url: ${{ needs.deploy.outputs.url }}   # must be within that asset's domain
           scans: security,qa,friction
           wait-for-url: true            # poll until the env is live...
           version-path: /version        # ...and serving THIS commit (no magic timer)

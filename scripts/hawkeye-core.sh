@@ -8,10 +8,11 @@
 #
 # Required env:
 #   HAWKEYE_TOKEN              Hawckeye API key
-#   one target (exactly one):
-#     HAWKEYE_ENVIRONMENT_URL  freshly-deployed environment to scan (web)
-#     HAWKEYE_ASSET_ID         registered authorized asset
-#     HAWKEYE_APK              path to an APK artifact (mobile)
+#   HAWKEYE_ASSET_ID           the verified, authorized asset to scan (REQUIRED) —
+#                              the engine rejects anything outside it (403)
+# Optional refinements (must fall WITHIN the asset; cannot pick a new target):
+#   HAWKEYE_ENVIRONMENT_URL    specific deployed URL within the asset's verified hosts
+#   HAWKEYE_APK                path to an APK build (must match the asset package/signature)
 # Optional env:
 #   HAWKEYE_SCANS         comma list of suites: security,qa,friction (default all)
 #   HAWKEYE_API           API base url (default https://api.hawckeye.com)
@@ -97,7 +98,13 @@ base="$(jq -nc \
   + (if $ref  == ""   then {} else {ref: $ref}       end)
   + (if $meta == null then {} else {metadata: $meta} end)')"
 
-# --- Resolve the target (exactly one) --------------------------------------
+# --- Target: asset_id is REQUIRED (the verified authorization boundary). ---
+# environment_url / apk only refine WHICH instance within that asset is scanned;
+# the engine rejects anything outside the asset with 403. CI cannot pick an
+# arbitrary target.
+[ -n "${HAWKEYE_ASSET_ID:-}" ] || die "HAWKEYE_ASSET_ID is required — the authorized, verified asset to scan. environment-url/apk only refine it."
+scan_body="$(echo "$base" | jq -c --arg a "$HAWKEYE_ASSET_ID" '. + {asset_id:$a}')"
+
 if [ -n "${HAWKEYE_APK:-}" ]; then
   [ -f "$HAWKEYE_APK" ] || die "APK not found: $HAWKEYE_APK"
   echo "hawkeye: requesting upload slot"
@@ -107,13 +114,10 @@ if [ -n "${HAWKEYE_APK:-}" ]; then
   [ -n "$put_url" ] || die "no upload URL returned: $up_json"
   echo "hawkeye: uploading $HAWKEYE_APK"
   curl -fsS --upload-file "$HAWKEYE_APK" "$put_url" >/dev/null
-  scan_body="$(echo "$base" | jq -c --arg u "$upload_id" '. + {upload_id:$u}')"
-elif [ -n "${HAWKEYE_ENVIRONMENT_URL:-}" ]; then
-  scan_body="$(echo "$base" | jq -c --arg e "$HAWKEYE_ENVIRONMENT_URL" '. + {environment_url:$e}')"
-elif [ -n "${HAWKEYE_ASSET_ID:-}" ]; then
-  scan_body="$(echo "$base" | jq -c --arg a "$HAWKEYE_ASSET_ID" '. + {asset_id:$a}')"
-else
-  die "set HAWKEYE_ENVIRONMENT_URL, HAWKEYE_ASSET_ID, or HAWKEYE_APK"
+  scan_body="$(echo "$scan_body" | jq -c --arg u "$upload_id" '. + {upload_id:$u}')"
+fi
+if [ -n "${HAWKEYE_ENVIRONMENT_URL:-}" ]; then
+  scan_body="$(echo "$scan_body" | jq -c --arg e "$HAWKEYE_ENVIRONMENT_URL" '. + {environment_url:$e}')"
 fi
 
 # --- Start the scan (fire-and-forget) --------------------------------------
