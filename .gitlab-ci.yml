@@ -31,4 +31,4 @@ create-release:
   release:
     tag_name: $CI_COMMIT_TAG
     name: "Hawckeye CI $CI_COMMIT_TAG"
-    description: "Hawckeye autonomous pentest trigger — GitLab CI/CD component."
+    description: "Hawckeye autonomous security, QA & product-friction trigger — GitLab CI/CD component."

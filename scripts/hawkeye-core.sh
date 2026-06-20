@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Hawckeye CI — core trigger client (engine-free).
 #
-# Starts a pentest scan on the hosted Hawckeye API against an AUTHORIZED target
+# Starts a scan on the hosted Hawckeye API against an AUTHORIZED target
 # (a registered URL asset, or an uploaded APK), waits for completion, and writes
 # hawkeye-findings.json + hawkeye-report.md. Contains no scanning logic — it only
 # calls the API, so it is safe to run on any untrusted CI runner and to open-source.
@@ -106,7 +106,7 @@ report="$HAWKEYE_OUTPUT_DIR/hawkeye-report.md"
 results_url="${HAWKEYE_API%/}/scans/$scan_id"
 {
   echo "<!-- hawkeye-report -->"
-  echo "## 🦅 Hawckeye Autonomous Pentest"
+  echo "## 🦅 Hawckeye"
   echo
   echo "**Scan** \`$scan_id\` · **Status** \`$status\` · **Findings** $count"
   echo

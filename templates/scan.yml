@@ -1,4 +1,4 @@
-# Hawckeye Autonomous Pentest — GitLab CI/CD Component.
+# Hawckeye — GitLab CI/CD Component.
 # Usage in a consumer .gitlab-ci.yml:
 #
 #   include:

@@ -1,13 +1,13 @@
 {
   "id": "c1a3be30-1420-4a83-9c29-97f9afef11ec",
   "name": "Hawckeye",
-  "friendlyName": "Hawckeye Autonomous Pentest",
-  "description": "Trigger a Hawckeye pentest against an authorized URL or APK and report findings on the PR.",
+  "friendlyName": "Hawckeye",
+  "description": "Autonomously tests an authorized URL or APK for security, QA, and product-friction issues and reports findings on the PR.",
   "helpMarkDown": "Set a secret variable HAWKEYE_TOKEN. Requires a Linux agent with bash/curl/jq.",
   "category": "Utility",
   "author": "Hawckeye",
   "version": { "Major": 1, "Minor": 0, "Patch": 0 },
-  "instanceNameFormat": "Hawckeye pentest",
+  "instanceNameFormat": "Hawckeye scan",
   "inputs": [
     { "name": "token", "type": "string", "label": "Hawckeye API key", "required": true, "helpMarkDown": "Use $(HAWKEYE_TOKEN) from a secret variable." },
     { "name": "assetId", "type": "string", "label": "Asset id (URL target)", "required": false, "helpMarkDown": "Use this OR apk." },

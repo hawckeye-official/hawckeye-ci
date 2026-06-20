@@ -1,17 +1,17 @@
-# Hawckeye Autonomous Pentest — CI integration
+# Hawckeye — CI integration
 
-Trigger a [Hawckeye](https://hawckeye.com) autonomous pentest against an **authorized
-URL or APK** from your CI, and get findings posted back to the PR/MR. Non-blocking
-by default.
+Run [Hawckeye](https://hawckeye.com) — autonomous **security, QA & product-friction**
+testing — against an **authorized URL or APK** from your CI, and get findings posted
+back to the PR/MR. Non-blocking by default.
 
 This repository is the **engine-free trigger client**. It contains no scanning
 logic — it only calls the hosted Hawckeye API, so it is safe to run on any runner.
-The pentest engine runs entirely on Hawckeye's infrastructure.
+The engine runs entirely on Hawckeye's infrastructure.
 
 ## How it works
 
 ```
-Your CI ──POST /v1/scans {asset_id|apk}──▶ Hawckeye API ──▶ engine runs the pentest
+Your CI ──POST /v1/scans {asset_id|apk}──▶ Hawckeye API ──▶ engine runs the scan
    ▲                                                              │
    └──────────────── sticky PR/MR comment ◀── poll /findings ─────┘
 ```

@@ -1,5 +1,5 @@
-name: "Hawckeye Autonomous Pentest"
-description: "Trigger a Hawckeye pentest against an authorized URL or APK and report findings on the PR. Non-blocking by default."
+name: "Hawckeye"
+description: "Autonomously tests an authorized URL or APK for security, QA, and product-friction issues and reports findings on the PR. Non-blocking by default."
 author: "Hawckeye"
 branding:
   icon: "shield"

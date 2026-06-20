@@ -1,5 +1,5 @@
 # Drop this in a consumer repo at .github/workflows/hawkeye.yml
-name: Hawckeye Pentest
+name: Hawckeye
 on:
   pull_request:
 

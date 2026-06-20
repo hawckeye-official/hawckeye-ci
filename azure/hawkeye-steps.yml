@@ -1,4 +1,4 @@
-# Hawckeye Autonomous Pentest — Azure Pipelines steps template.
+# Hawckeye — Azure Pipelines steps template.
 # Quick adopt (no Marketplace extension needed). In a consumer pipeline:
 #
 #   resources:
@@ -57,7 +57,7 @@ steps:
       export HAWKEYE_FINDINGS_COUNT="$(jq '(.findings // []) | length' hawkeye-findings.json)"
       export HAWKEYE_MAX_SEVERITY="$(jq -r 'def r:{info:0,low:1,medium:2,high:3,critical:4}[(.|ascii_downcase)]//0; ((.findings//[])|map((.severity//"info")|r)|max//0) as $m|["info","low","medium","high","critical"][$m]' hawkeye-findings.json)"
       bash .hawkeye/gate.sh
-    displayName: 'Hawckeye Autonomous Pentest'
+    displayName: 'Hawckeye'
     continueOnError: ${{ parameters.nonBlocking }}
     env:
       HAWKEYE_API: ${{ parameters.apiUrl }}

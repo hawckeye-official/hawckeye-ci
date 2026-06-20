@@ -1,12 +1,12 @@
 {
   "manifestVersion": 1,
-  "id": "hawkeye-pentest",
-  "name": "Hawckeye Autonomous Pentest",
+  "id": "hawckeye",
+  "name": "Hawckeye",
   "version": "1.0.0",
   "publisher": "hawckeye",
-  "description": "Trigger a Hawckeye pentest against an authorized URL or APK and report findings on the PR. Non-blocking by default.",
+  "description": "Autonomously tests an authorized URL or APK for security, QA, and product-friction issues and reports findings on the PR. Non-blocking by default.",
   "categories": ["Azure Pipelines"],
-  "tags": ["security", "pentest", "DAST", "code review"],
+  "tags": ["security", "qa", "quality", "testing"],
   "icons": { "default": "icon.png" },
   "targets": [{ "id": "Microsoft.VisualStudio.Services" }],
   "contributions": [

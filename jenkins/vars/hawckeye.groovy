@@ -1,4 +1,4 @@
-// Hawckeye Autonomous Pentest — Jenkins shared library global step.
+// Hawckeye — Jenkins shared library global step.
 //
 // Configure this repo as a Global Pipeline Library named 'hawkeye'
 // (Manage Jenkins → System → Global Pipeline Libraries, point at this repo).

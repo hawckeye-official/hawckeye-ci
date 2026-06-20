@@ -4,7 +4,7 @@
 pipeline {
   agent any
   stages {
-    stage('Hawckeye Pentest') {
+    stage('Hawckeye') {
       steps {
         hawckeye(
           assetId: 'as_9f3c...',          // or apk: 'build/app-release.apk'
