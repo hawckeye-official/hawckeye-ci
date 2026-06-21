@@ -19,4 +19,3 @@ steps:
   - template: azure/hawkeye-steps.yml@hawckeye
     parameters:
       environmentUrl: 'https://staging.my-app.com'   # must be within that asset's domain
-      scans: 'security,qa,friction'

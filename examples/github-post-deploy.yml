@@ -25,7 +25,6 @@ jobs:
         with:
           api-key: ${{ secrets.HAWKEYE_API_KEY }}
           environment-url: ${{ needs.deploy.outputs.url }}   # must be within that asset's domain
-          scans: security,qa,friction
           wait-for-url: true            # poll until the env is live...
           version-path: /version        # ...and serving THIS commit (no magic timer)
           # expected-ref defaults to the workflow sha

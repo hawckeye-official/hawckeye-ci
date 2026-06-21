@@ -14,7 +14,6 @@ jobs:
         with:
           api-key: ${{ secrets.HAWKEYE_API_KEY }}
           environment-url: ${{ github.event.deployment_status.environment_url }}  # must be within it
-          scans: security,qa,friction
           # optional belt-and-suspenders: confirm the right build is live
           # wait-for-url: true
           # version-path: /version

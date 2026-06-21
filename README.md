@@ -27,7 +27,7 @@ certificate). CI can pass a specific `environment-url` or `apk`, but only ones *
 that asset; the API returns `403` for anything else. CI can never point Hawckeye at an
 arbitrary URL or app it isn't authorized to test.
 
-Three suites, pick any subset via `scans`: **security**, **qa**, **friction**.
+All three suites run by default — **security**, **qa**, **friction**. Optionally narrow with the `scans` input.
 
 ## Setup (once)
 
@@ -50,7 +50,6 @@ jobs:
         with:
           api-key: ${{ secrets.HAWKEYE_API_KEY }}
           environment-url: "https://staging.my-app.com"   # must be within the key's asset
-          scans: security,qa,friction
 ```
 
 | Input | Default | Notes |
@@ -120,7 +119,6 @@ Add this repo as a Global Pipeline Library named `hawckeye`, then:
 @Library('hawckeye') _
 hawckeye(
   environmentUrl: 'https://staging.my-app.com', // must be within it (or apk: '...')
-  scans: 'security,qa,friction',
   hawkeyeCredId: 'hawckeye-api-key'               // Secret text = Hawckeye API key
 )
 ```

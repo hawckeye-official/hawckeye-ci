@@ -10,7 +10,6 @@ pipeline {
       steps {
         hawckeye(
           environmentUrl: 'https://staging.my-app.com', // must be within it (or apk: '...')
-          scans: 'security,qa,friction',
           hawkeyeCredId: 'hawckeye-api-key'               // Secret text = Hawckeye API key
         )
       }
