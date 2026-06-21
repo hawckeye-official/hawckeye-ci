@@ -13,7 +13,6 @@ jobs:
       - uses: hawckeye-official/hawckeye-ci@v1
         with:
           api-key: ${{ secrets.HAWKEYE_API_KEY }}
-          asset-id: "as_9f3c..."                 # required: your verified, authorized asset
           environment-url: ${{ github.event.deployment_status.environment_url }}  # must be within it
           scans: security,qa,friction
           # optional belt-and-suspenders: confirm the right build is live

@@ -7,18 +7,18 @@ branding:
 
 inputs:
   api-key:
-    description: "Hawckeye API key (store as a repo/org secret)."
+    description: "Hawckeye API key (scoped to your verified asset). Store as a repo/org secret."
     required: true
   environment-url:
-    description: "Freshly-deployed test/staging URL to scan (web). Use this OR asset-id OR apk."
-    required: false
-    default: ""
-  asset-id:
-    description: "Registered authorized asset id. Use this OR environment-url OR apk."
+    description: "Freshly-deployed URL to scan (web). Must be within the key's asset."
     required: false
     default: ""
   apk:
-    description: "Path to an APK artifact to scan (mobile). Use this OR environment-url OR asset-id."
+    description: "Path to an APK artifact to scan (mobile). Must match the key's asset."
+    required: false
+    default: ""
+  asset-id:
+    description: "Optional. Only for an account-level key that spans multiple assets."
     required: false
     default: ""
   scans:

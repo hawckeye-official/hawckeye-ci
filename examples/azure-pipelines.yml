@@ -18,6 +18,5 @@ steps:
   # ...your deploy steps here, producing the test env URL...
   - template: azure/hawkeye-steps.yml@hawckeye
     parameters:
-      assetId: 'as_9f3c...'                          # required: your verified, authorized asset
       environmentUrl: 'https://staging.my-app.com'   # must be within that asset's domain
       scans: 'security,qa,friction'

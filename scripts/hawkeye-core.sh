@@ -7,12 +7,11 @@
 # per the asset's config) — NOT back to this job or a PR. No scanning logic here.
 #
 # Required env:
-#   HAWKEYE_API_KEY              Hawckeye API key
-#   HAWKEYE_ASSET_ID           the verified, authorized asset to scan (REQUIRED) —
-#                              the engine rejects anything outside it (403)
-# Optional refinements (must fall WITHIN the asset; cannot pick a new target):
-#   HAWKEYE_ENVIRONMENT_URL    specific deployed URL within the asset's verified hosts
-#   HAWKEYE_APK                path to an APK build (must match the asset package/signature)
+#   HAWKEYE_API_KEY            Hawckeye API key (scoped to your verified asset)
+# Optional (must stay WITHIN the key's asset; the engine rejects anything else, 403):
+#   HAWKEYE_ENVIRONMENT_URL    specific deployed URL to scan (web)
+#   HAWKEYE_APK                path to an APK build (mobile)
+#   HAWKEYE_ASSET_ID           only for account-level keys spanning multiple assets
 # Optional env:
 #   HAWKEYE_SCANS         comma list of suites: security,qa,friction (default all)
 #   HAWKEYE_API           API base url (default https://api.hawckeye.com)
@@ -98,12 +97,14 @@ base="$(jq -nc \
   + (if $ref  == ""   then {} else {ref: $ref}       end)
   + (if $meta == null then {} else {metadata: $meta} end)')"
 
-# --- Target: asset_id is REQUIRED (the verified authorization boundary). ---
-# environment_url / apk only refine WHICH instance within that asset is scanned;
-# the engine rejects anything outside the asset with 403. CI cannot pick an
-# arbitrary target.
-[ -n "${HAWKEYE_ASSET_ID:-}" ] || die "HAWKEYE_ASSET_ID is required — the authorized, verified asset to scan. environment-url/apk only refine it."
-scan_body="$(echo "$base" | jq -c --arg a "$HAWKEYE_ASSET_ID" '. + {asset_id:$a}')"
+# --- Target: the API key is scoped to a verified asset, so nothing else is ---
+# strictly required. environment_url / apk refine WHICH instance is scanned;
+# asset_id is only needed for an account-level key spanning multiple assets.
+# The engine rejects anything outside the key's asset with 403.
+scan_body="$base"
+if [ -n "${HAWKEYE_ASSET_ID:-}" ]; then
+  scan_body="$(echo "$scan_body" | jq -c --arg a "$HAWKEYE_ASSET_ID" '. + {asset_id:$a}')"
+fi
 
 if [ -n "${HAWKEYE_APK:-}" ]; then
   [ -f "$HAWKEYE_APK" ] || die "APK not found: $HAWKEYE_APK"

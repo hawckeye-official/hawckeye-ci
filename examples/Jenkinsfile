@@ -9,7 +9,6 @@ pipeline {
     stage('Hawckeye') {
       steps {
         hawckeye(
-          assetId: 'as_9f3c...',                        // required: your verified, authorized asset
           environmentUrl: 'https://staging.my-app.com', // must be within it (or apk: '...')
           scans: 'security,qa,friction',
           hawkeyeCredId: 'hawckeye-api-key'               // Secret text = Hawckeye API key

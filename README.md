@@ -21,19 +21,18 @@ Why post-deploy, not on the PR? The scans need a **running instance** of your pr
 and they run **after merge/deploy** — so findings are tracked work items (Linear),
 not PR comments.
 
-**Scope is locked to a verified asset.** `asset-id` is always required — it's an asset
-you proved you own at onboarding (domain via DNS, or app via signing certificate). CI
-can pass a specific `environment-url` or `apk`, but only ones **within** that asset; the
-API returns `403` for anything else. CI can never point Hawckeye at an arbitrary URL or
-app it isn't authorized to test.
+**Scope is locked to a verified asset — via the API key.** Your `api-key` is scoped to
+an asset you proved you own at onboarding (domain via DNS, or app via signing
+certificate). CI can pass a specific `environment-url` or `apk`, but only ones **within**
+that asset; the API returns `403` for anything else. CI can never point Hawckeye at an
+arbitrary URL or app it isn't authorized to test.
 
 Three suites, pick any subset via `scans`: **security**, **qa**, **friction**.
 
 ## Setup (once)
 
-1. Get a **Hawckeye API key** → store it as a CI secret named `HAWKEYE_API_KEY`.
-2. Register your target (**verify ownership**) + connect **Linear** / notification emails
-   → you get an **`asset-id`**.
+1. Onboard your target (**verify ownership**) + connect **Linear** / notification emails.
+2. Get your **Hawckeye API key** (scoped to that asset) → store it as a CI secret named `HAWKEYE_API_KEY`.
 3. Add the snippet below **after your deploy step**.
 
 ## GitHub Actions
@@ -50,16 +49,15 @@ jobs:
       - uses: hawckeye-official/hawckeye-ci@v1
         with:
           api-key: ${{ secrets.HAWKEYE_API_KEY }}
-          asset-id: "as_9f3c..."                          # required: verified, authorized asset
-          environment-url: "https://staging.my-app.com"   # must be within that asset's domain
+          environment-url: "https://staging.my-app.com"   # must be within the key's asset
           scans: security,qa,friction
 ```
 
 | Input | Default | Notes |
 |---|---|---|
-| `api-key` | — | **required**, Hawckeye API key |
-| `asset-id` | — | **required**, the verified asset (scope boundary) |
-| `environment-url` / `apk` | — | optional refinement; must be **within** the asset |
+| `api-key` | — | **required**, scoped to your verified asset |
+| `environment-url` / `apk` | — | the deployed URL / APK to scan; must be **within** the key's asset |
+| `asset-id` | — | optional; only for an account-level key spanning multiple assets |
 | `scans` | `security,qa,friction` | comma list of suites |
 | `api-url` | `https://api.hawckeye.com` | |
 | `wait` | `false` | fire-and-forget; set `true` to make the job reflect status |
@@ -90,7 +88,6 @@ Either:
 include:
   - component: $CI_SERVER_FQDN/hawckeye-official/hawckeye-ci/scan@1
     inputs:
-      asset-id: "as_9f3c..."                          # required: verified asset
       environment-url: "https://staging.my-app.com"   # must be within it
 ```
 
@@ -109,7 +106,6 @@ resources:
 steps:
   - template: azure/hawkeye-steps.yml@hawckeye
     parameters:
-      assetId: "as_9f3c..."                          # required: verified asset
       environmentUrl: "https://staging.my-app.com"   # must be within it
 ```
 
@@ -123,7 +119,6 @@ Add this repo as a Global Pipeline Library named `hawckeye`, then:
 ```groovy
 @Library('hawckeye') _
 hawckeye(
-  assetId: 'as_9f3c...',                        // required: verified asset
   environmentUrl: 'https://staging.my-app.com', // must be within it (or apk: '...')
   scans: 'security,qa,friction',
   hawkeyeCredId: 'hawckeye-api-key'               // Secret text = Hawckeye API key
