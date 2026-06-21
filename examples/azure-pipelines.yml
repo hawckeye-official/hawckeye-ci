@@ -1,5 +1,5 @@
 # Consumer pipeline (Azure DevOps). Run Hawckeye AFTER deploy to a test env.
-# Define a secret variable HAWKEYE_TOKEN. Linux agent required (bash/curl/jq).
+# Define a secret variable HAWKEYE_API_KEY. Linux agent required (bash/curl/jq).
 trigger:
   - main
 

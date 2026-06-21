@@ -6,7 +6,7 @@
 #       inputs:
 #         environment-url: "https://staging.my-app.com"   # or asset-id / apk
 #
-# Set CI/CD variable HAWKEYE_TOKEN (masked).
+# Set CI/CD variable HAWKEYE_API_KEY (masked).
 spec:
   inputs:
     environment-url:

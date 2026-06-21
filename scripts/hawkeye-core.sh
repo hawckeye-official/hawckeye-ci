@@ -7,7 +7,7 @@
 # per the asset's config) — NOT back to this job or a PR. No scanning logic here.
 #
 # Required env:
-#   HAWKEYE_TOKEN              Hawckeye API key
+#   HAWKEYE_API_KEY              Hawckeye API key
 #   HAWKEYE_ASSET_ID           the verified, authorized asset to scan (REQUIRED) —
 #                              the engine rejects anything outside it (403)
 # Optional refinements (must fall WITHIN the asset; cannot pick a new target):
@@ -42,18 +42,18 @@ need() { command -v "$1" >/dev/null 2>&1 || die "missing required tool: $1"; }
 
 need curl
 need jq
-[ -n "${HAWKEYE_TOKEN:-}" ] || die "HAWKEYE_TOKEN is required"
+[ -n "${HAWKEYE_API_KEY:-}" ] || die "HAWKEYE_API_KEY is required"
 
 # api METHOD PATH [json-body]
 api() {
   local method="$1" path="$2" body="${3:-}"
   if [ -n "$body" ]; then
     curl -fsS -X "$method" "$HAWKEYE_API$path" \
-      -H "Authorization: Bearer $HAWKEYE_TOKEN" \
+      -H "Authorization: Bearer $HAWKEYE_API_KEY" \
       -H "Content-Type: application/json" -d "$body"
   else
     curl -fsS -X "$method" "$HAWKEYE_API$path" \
-      -H "Authorization: Bearer $HAWKEYE_TOKEN"
+      -H "Authorization: Bearer $HAWKEYE_API_KEY"
   fi
 }
 

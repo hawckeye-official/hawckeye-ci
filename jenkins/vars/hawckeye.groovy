@@ -6,7 +6,7 @@
 //   hawckeye(
 //     environmentUrl: 'https://staging.my-app.com',  // or assetId / apk
 //     scans: 'security,qa,friction',
-//     hawkeyeCredId: 'hawckeye-token'                 // Secret text = Hawckeye API key
+//     hawkeyeCredId: 'hawckeye-api-key'                 // Secret text = Hawckeye API key
 //   )
 def call(Map cfg = [:]) {
   String apiUrl     = cfg.apiUrl     ?: 'https://api.hawckeye.com'
@@ -20,10 +20,10 @@ def call(Map cfg = [:]) {
   String versionPath = cfg.versionPath ?: ''
   String clientRef  = cfg.clientRef  ?: 'v1'
   String clientBase = cfg.clientBase ?: 'https://raw.githubusercontent.com/hawckeye-official/hawckeye-ci'
-  String hawkeyeCred = cfg.hawkeyeCredId ?: 'hawckeye-token'
+  String hawkeyeCred = cfg.hawkeyeCredId ?: 'hawckeye-api-key'
   String clientUrl  = "${clientBase}/${clientRef}/scripts"
 
-  withCredentials([string(credentialsId: hawkeyeCred, variable: 'HAWKEYE_TOKEN')]) {
+  withCredentials([string(credentialsId: hawkeyeCred, variable: 'HAWKEYE_API_KEY')]) {
     withEnv([
       "HAWKEYE_API=${apiUrl}",
       "HAWKEYE_ENVIRONMENT_URL=${envUrl}",

@@ -10,7 +10,7 @@ const inp = (n, d = '') => process.env['INPUT_' + n.toUpperCase()] || d;
 
 const env = Object.assign({}, process.env, {
   HAWKEYE_API: inp('apiUrl', 'https://api.hawckeye.com'),
-  HAWKEYE_TOKEN: inp('token'),
+  HAWKEYE_API_KEY: inp('apiKey'),
   HAWKEYE_ENVIRONMENT_URL: inp('environmentUrl'),
   HAWKEYE_ASSET_ID: inp('assetId'),
   HAWKEYE_APK: inp('apk'),

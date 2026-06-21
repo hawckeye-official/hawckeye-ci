@@ -14,7 +14,7 @@ network calls it makes.
 
 ## Tokens & scopes
 
-- `HAWKEYE_TOKEN` — your Hawckeye API key. Store it as a masked CI secret. It is
+- `HAWKEYE_API_KEY` — your Hawckeye API key. Store it as a masked CI secret. It is
   scoped to **your** authorized assets only.
 - `GITHUB_TOKEN` / `GITLAB_TOKEN` — used by the client to post the report
   comment. Minimum scopes: GitHub `pull-requests: write`; GitLab `api` (for the

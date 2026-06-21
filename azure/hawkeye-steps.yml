@@ -12,7 +12,7 @@
 #       parameters:
 #         environmentUrl: 'https://staging.my-app.com'   # or assetId / apk
 #
-# Define a secret variable HAWKEYE_TOKEN on the pipeline.
+# Define a secret variable HAWKEYE_API_KEY on the pipeline.
 parameters:
   - name: environmentUrl
     type: string
@@ -58,7 +58,7 @@ steps:
     displayName: 'Hawckeye'
     env:
       HAWKEYE_API: ${{ parameters.apiUrl }}
-      HAWKEYE_TOKEN: $(HAWKEYE_TOKEN)
+      HAWKEYE_API_KEY: $(HAWKEYE_API_KEY)
       HAWKEYE_ENVIRONMENT_URL: ${{ parameters.environmentUrl }}
       HAWKEYE_ASSET_ID: ${{ parameters.assetId }}
       HAWKEYE_APK: ${{ parameters.apk }}

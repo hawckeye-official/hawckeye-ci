@@ -31,7 +31,7 @@ Three suites, pick any subset via `scans`: **security**, **qa**, **friction**.
 
 ## Setup (once)
 
-1. Get a **Hawckeye API key** → store it as a CI secret named `HAWKEYE_TOKEN`.
+1. Get a **Hawckeye API key** → store it as a CI secret named `HAWKEYE_API_KEY`.
 2. Register your target (**verify ownership**) + connect **Linear** / notification emails
    → you get an **`asset-id`**.
 3. Add the snippet below **after your deploy step**.
@@ -49,7 +49,7 @@ jobs:
       # ...deploy to your test env, exposing its URL...
       - uses: hawckeye-official/hawckeye-ci@v1
         with:
-          token: ${{ secrets.HAWKEYE_TOKEN }}
+          api-key: ${{ secrets.HAWKEYE_API_KEY }}
           asset-id: "as_9f3c..."                          # required: verified, authorized asset
           environment-url: "https://staging.my-app.com"   # must be within that asset's domain
           scans: security,qa,friction
@@ -57,7 +57,7 @@ jobs:
 
 | Input | Default | Notes |
 |---|---|---|
-| `token` | — | **required**, Hawckeye API key |
+| `api-key` | — | **required**, Hawckeye API key |
 | `asset-id` | — | **required**, the verified asset (scope boundary) |
 | `environment-url` / `apk` | — | optional refinement; must be **within** the asset |
 | `scans` | `security,qa,friction` | comma list of suites |
@@ -86,7 +86,7 @@ Either:
 ## GitLab CI
 
 ```yaml
-# .gitlab-ci.yml — set HAWKEYE_TOKEN (masked). Runs on the default branch.
+# .gitlab-ci.yml — set HAWKEYE_API_KEY (masked). Runs on the default branch.
 include:
   - component: $CI_SERVER_FQDN/hawckeye-official/hawckeye-ci/scan@1
     inputs:
@@ -96,7 +96,7 @@ include:
 
 ## Azure DevOps
 
-Steps template (Linux agent; secret var `HAWKEYE_TOKEN`):
+Steps template (Linux agent; secret var `HAWKEYE_API_KEY`):
 
 ```yaml
 resources:
@@ -126,7 +126,7 @@ hawckeye(
   assetId: 'as_9f3c...',                        // required: verified asset
   environmentUrl: 'https://staging.my-app.com', // must be within it (or apk: '...')
   scans: 'security,qa,friction',
-  hawkeyeCredId: 'hawckeye-token'               // Secret text = Hawckeye API key
+  hawkeyeCredId: 'hawckeye-api-key'               // Secret text = Hawckeye API key
 )
 ```
 
